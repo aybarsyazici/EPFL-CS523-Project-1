@@ -69,18 +69,18 @@ class SMCParty:
             self,
             expr: Expression
         ):
-        # if expr is an addition operation:
-        #     ...
 
-        # if expr is a multiplication operation:
-        #     ...
-
-        # if expr is a secret:
-        #     ...
-
-        # if expr is a scalar:
-        #     ...
-        #
+        #TODO consider using match-case statement
+        if expr.type == 0:          # if expr is a scalar, return the value of scalar
+            return expr.value
+        elif expr.type == 1:        
+            return 1                #this is a placeholder TODO talk about this line
+        elif expr.type == 2:        #if expression is addition, add its operands
+            return self.process_expression(expr.operand1) + self.process_expression(expr.operand2)
+        elif expr.type == 3:       #if expression is addition, subtract its operands
+            return self.process_expression(expr.operand1) - self.process_expression(expr.operand2)
+        elif expr.type == 4: 
+            return 4 #placeholder TODO implement beaver triplet
         # Call specialized methods for each expression type, and have these specialized
         # methods in turn call `process_expression` on their sub-expressions to process
         # further.
