@@ -37,6 +37,23 @@ class Expression:
         if id is None:
             id = gen_id()
         self.id = id
+    
+    def prec(self) -> int:
+        """Returns the precedence of the expression."""
+        if isinstance(self, MultOperation):
+            return 2
+        elif isinstance(self, AddOperation):
+            return 1
+        elif isinstance(self, SubOperation):
+            return 1
+        return 3
+
+    def child_repr(self, child) -> str:
+        """Returns a correct representation of the given child expression, wrapping with parentheses if necessary."""
+        child_str = repr(child)
+        if child.prec() < self.prec():
+            return f"({child_str})"
+        return child_str
 
     def __add__(self, other):
         return AddOperation(self, other)
@@ -73,14 +90,15 @@ class Scalar(Expression):
 
     # Feel free to add as many methods as you like.
 
-
 class Secret(Expression):
     """Term representing a secret finite field value (variable)."""
 
     def __init__(
             self,
+            value,
             id: Optional[bytes] = None
         ):
+        self.value = value
         super().__init__(id)
 
 
@@ -92,25 +110,30 @@ class Secret(Expression):
 
     # Feel free to add as many methods as you like.
 
-
 """ A simple class representing the addition of two variables"""
 class AddOperation(Expression):
     def __init__(self, operand1, operand2):
-        self.operand1 = operand1
-        self.operand2 = operand2
+        self.left = operand1
+        self.right = operand2
+    def __repr__(self):
+        return f"{self.child_repr(self.left)} + {self.child_repr(self.right)}"
 
 
 """ A simple class representing the subtraction of two variables"""
 class SubOperation(Expression):
     def __init__(self, operand1, operand2):
-        self.operand1 = operand1
-        self.operand2 = operand2        
+        self.left = operand1
+        self.right = operand2   
+    def __repr__(self):
+        return f"{self.child_repr(self.left)} - {self.child_repr(self.right)}"     
 
 
 """ A simple class representing the multiplication of two variables"""
 class MultOperation(Expression):
     def __init__(self, operand1, operand2):
-        self.operand1 = operand1
-        self.operand2 = operand2  
+        self.left = operand1
+        self.right = operand2  
+    def __repr__(self):
+        return f"{self.child_repr(self.left)} * {self.child_repr(self.right)}"  
 
 # Feel free to add as many classes as you like.

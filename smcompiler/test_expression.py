@@ -7,15 +7,20 @@ MODIFY THIS FILE.
 
 from expression import Secret, Scalar
 
+tests = {
+    repr(Secret(1) + Secret(2)): "Secret(1) + Secret(2)",
+    repr(Secret(2) * Secret(1)): "Secret(2) * Secret(1)",
+    repr(Secret(1) * Secret(2) * Secret(3)): "Secret(1) * Secret(2) * Secret(3)",
+    repr(Secret(1) * (Secret(2) + Secret(3) * Scalar(4))): "Secret(1) * (Secret(2) + Secret(3) * Scalar(4))",
+    repr((Secret(1) + Secret(2)) * Secret(3) * Scalar(4) + Scalar(3)): "(Secret(1) + Secret(2)) * Secret(3) * Scalar(4) + Scalar(3)",
+}
 
 # Example test, you can adapt it to your needs.
 def test_expr_construction():
-    a = Secret(1)
-    b = Secret(2)
-    c = Secret(3)
-    expr = (a + b) * c * Scalar(4) + Scalar(3)
-    # assert repr(expr) == "((Secret(1) + Secret(2)) * Secret(3) * Scalar(4) + Scalar(3))"
+    for expr, expected in tests.items():
+        print(f"Testing {expr} == {expected}")
+        assert expr == expected
+        print("Passed!")
 
-
-def test():
-    raise NotImplementedError("You can create some tests.")
+if __name__ == "__main__":
+    test_expr_construction()
