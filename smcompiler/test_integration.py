@@ -276,7 +276,27 @@ def test_suite10():
 
 def test_suite11():
     """
-    f(a, b) = a - b
+    f(a, b) = a - b + c - d
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+    can_secret = Secret()
+    aybars_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 14},
+        "Bob": {bob_secret: 3},
+        "Can": {can_secret: 5},
+        "Aybars": {aybars_secret: 7}
+    }
+
+    expr = (alice_secret - bob_secret + can_secret - aybars_secret)
+    expected = 14 - 3 + 5 - 7
+    suite(parties, expr, expected)
+
+def test_suite12():
+    """
+    f(a, b) = a - b - c + d
     """
     alice_secret = Secret()
     bob_secret = Secret()

@@ -67,6 +67,23 @@ class Expression:
     def __hash__(self):
         return hash(self.id)
 
+    def is_term(self) -> bool:
+        """Returns true iff the expression is a term."""
+        return isinstance(self, Secret) or isinstance(self, Scalar)
+
+    def print_tree(self, indent: int = 0):
+        """Prints the expression tree. """
+        if(indent > 0):
+            print(" " * (indent-2) + "|" + " " + "-", self)
+        else:
+            print(self)
+        if not self.is_term():
+            self.left.print_tree(indent + 2)
+            self.right.print_tree(indent + 2)
+
+
+
+
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
 

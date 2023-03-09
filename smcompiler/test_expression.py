@@ -5,15 +5,25 @@ Testing expressions is not obligatory.
 MODIFY THIS FILE.
 """
 
-from expression import Secret, Scalar
+from expression import Secret, Scalar, Expression
 
 tests = {
     repr(Secret(1) + Secret(2)): "Secret(1) + Secret(2)",
     repr(Secret(2) * Secret(1)): "Secret(2) * Secret(1)",
+    repr(Secret() + Secret() + Secret() + Scalar(5)): "Secret() + Secret() + Secret() + Scalar(5)",
+    #repr((Secret() + Secret()) + (Secret() + Scalar(5))): "(Secret() + Secret()) + (Secret() + Scalar(5))",
     repr(Secret(1) * Secret(2) * Secret(3)): "Secret(1) * Secret(2) * Secret(3)",
     repr(Secret(1) * (Secret(2) + Secret(3) * Scalar(4))): "Secret(1) * (Secret(2) + Secret(3) * Scalar(4))",
     repr((Secret(1) + Secret(2)) * Secret(3) * Scalar(4) + Scalar(3)): "(Secret(1) + Secret(2)) * Secret(3) * Scalar(4) + Scalar(3)",
+    repr(Secret(1) + Secret(2) * Secret(3) * Scalar(4) + Scalar(3)): "Secret(1) + Secret(2) * Secret(3) * Scalar(4) + Scalar(3)",
 }
+
+tree_tests: list[Expression] = [
+    (Secret(1) + Secret(2)),
+    (Secret(1) * Secret(2) + Secret(3)),
+    (Secret(1) * (Secret(2) + Secret(3) * Scalar(4))),
+    ((Secret(5) - Secret(2)) * (Secret(8) + Secret(14)))
+]
 
 # Example test, you can adapt it to your needs.
 def test_expr_construction():
@@ -22,5 +32,11 @@ def test_expr_construction():
         assert expr == expected
         print("Passed!")
 
+def test_tree_print():
+    for test in tree_tests:
+        test.print_tree()
+        print("_________________")
+
 if __name__ == "__main__":
-    test_expr_construction()
+    #test_expr_construction()
+    test_tree_print()
