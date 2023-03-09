@@ -71,18 +71,15 @@ class Expression:
         """Returns true iff the expression is a term."""
         return isinstance(self, Secret) or isinstance(self, Scalar)
 
-    def print_tree(self, indent: int = 0):
+    def print_tree(self, indent: int = -1):
         """Prints the expression tree. """
-        if(indent > 0):
-            print(" " * (indent-2) + "|" + " " + "-", self)
+        if(indent >= 0):
+            print(" " * indent + "↳", self)
         else:
             print(self)
         if not self.is_term():
             self.left.print_tree(indent + 2)
             self.right.print_tree(indent + 2)
-
-
-
 
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
