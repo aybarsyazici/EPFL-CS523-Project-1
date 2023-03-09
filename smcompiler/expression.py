@@ -95,7 +95,7 @@ class Secret(Expression):
 
     def __init__(
             self,
-            value,
+            value: Optional[int] = None,
             id: Optional[bytes] = None
         ):
         self.value = value

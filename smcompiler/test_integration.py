@@ -273,3 +273,7 @@ def test_suite10():
     expr = alice_secret + bob_secret * (Scalar(15) + Scalar(15) * Scalar(3))
     expected = 3 + 5 * (15 + 15 * 3)
     suite(parties, expr, expected)
+
+# main
+if __name__ == "__main__":
+    test_suite4()

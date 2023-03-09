@@ -13,7 +13,7 @@ from typing import (
 
 from communication import Communication
 from secret_sharing import(
-    share_secret,
+    gen_share,
     Share,
 )
 import random

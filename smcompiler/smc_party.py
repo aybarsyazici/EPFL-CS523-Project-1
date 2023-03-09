@@ -26,7 +26,9 @@ from expression import (
 from protocol import ProtocolSpec
 from secret_sharing import(
     reconstruct_secret,
-    share_secret,
+    retrieve_share,
+    send_share,
+    gen_share,
     Share,
 )
 
@@ -62,10 +64,19 @@ class SMCParty:
 
 
     def run(self) -> int:
-        """
-        The method the client use to do the SMC.
-        """
-        raise NotImplementedError("You need to implement this method.")
+        # Implementation of SMC protocol
+        # Iterate over the secrets that this party is responsible for.
+        for secret in self.value_dict:
+            # create shares of the secret
+            shares = gen_share(self.value_dict[secret], len(self.protocol_spec.participant_ids))
+            print(shares)
+            for participant, share in zip(self.protocol_spec.participant_ids, shares):
+                # send share to participant using self.comm.send_private_message
+                send_share(share, participant, secret.id, self.comm)
+        # Process the expression
+        result_share = self.process_expression(self.protocol_spec.expr)
+
+
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -73,7 +84,7 @@ class SMCParty:
             self,
             expr: Expression
         ):
-
+        print("PROCESS EXPR: ", expr)
         #TODO consider using match-case statement
         if isinstance(expr, Scalar):          # if expr is a scalar, return the value of scalar
             return self.handle_scalar(expr)
@@ -95,10 +106,10 @@ class SMCParty:
     def handle_scalar(self, expression):
         return expression.value
     def handle_secret(self, expression):
-        pass
+        return retrieve_share(expression.id, self.comm)
     def handle_add(self, expression):
-        return self.process_expression(expression.operand1) + self.process_expression(expression.operand2)
+        return self.process_expression(expression.left) + self.process_expression(expression.right)
     def handle_sub(self, expression):
-        return self.process_expression(expression.operand1) - self.process_expression(expression.operand2)
+        return self.process_expression(expression.left) - self.process_expression(expression.right)
     def handle_mult(self, expression):
         pass

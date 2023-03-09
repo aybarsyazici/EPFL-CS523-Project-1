@@ -12,3 +12,7 @@ class ProtocolSpec:
     def __init__(self, participant_ids: list, expr: Expression):
         self.participant_ids = participant_ids
         self.expr = expr
+    
+    # to string
+    def __repr__(self):
+        return f"ProtocolSpec({self.participant_ids}, {self.expr})"
