@@ -16,6 +16,8 @@ from secret_sharing import(
     share_secret,
     Share,
 )
+import random
+
 
 # Feel free to add as many imports as you want.
 
@@ -27,6 +29,9 @@ class TrustedParamGenerator:
 
     def __init__(self):
         self.participant_ids: Set[str] = set()
+        self.a = -1
+        self.b = -1
+        self.c = -1
 
 
     def add_participant(self, participant_id: str) -> None:
@@ -40,5 +45,10 @@ class TrustedParamGenerator:
         Retrieve a triplet of shares for a given client_id.
         """
         raise NotImplementedError("You need to implement this method.")
+
+    def generate_new_triplet(self):
+        self.a = random.randint(0,1000000)
+        self.b = random.randint(0,1000000)
+        self.c = self.a * self.b
 
     # Feel free to add as many methods as you want.

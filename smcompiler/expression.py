@@ -52,16 +52,6 @@ class Expression:
 
     # Feel free to add as many methods as you like.      
 
-"""
-Below are the different types of expressions
-Each has an integer variable denoting the type
-0: Scalar
-1: Secret
-2: Addition
-3: Subtraction
-4: Multiplication
-"""
-
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
 
@@ -71,7 +61,6 @@ class Scalar(Expression):
             id: Optional[bytes] = None
         ):
         self.value = value
-        self.type = 0
         super().__init__(id)
 
 
@@ -92,7 +81,6 @@ class Secret(Expression):
             self,
             id: Optional[bytes] = None
         ):
-        self.type = 1
         super().__init__(id)
 
 
@@ -110,7 +98,6 @@ class AddOperation(Expression):
     def __init__(self, operand1, operand2):
         self.operand1 = operand1
         self.operand2 = operand2
-        self.type = 2
 
 
 """ A simple class representing the subtraction of two variables"""
@@ -118,7 +105,6 @@ class SubOperation(Expression):
     def __init__(self, operand1, operand2):
         self.operand1 = operand1
         self.operand2 = operand2        
-        self.type = 3
 
 
 """ A simple class representing the multiplication of two variables"""
@@ -126,6 +112,5 @@ class MultOperation(Expression):
     def __init__(self, operand1, operand2):
         self.operand1 = operand1
         self.operand2 = operand2  
-        self.type = 4
 
 # Feel free to add as many classes as you like.

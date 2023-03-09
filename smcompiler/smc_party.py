@@ -17,7 +17,11 @@ from typing import (
 from communication import Communication
 from expression import (
     Expression,
-    Secret
+    Secret,
+    Scalar,
+    AddOperation,
+    MultOperation, 
+    SubOperation
 )
 from protocol import ProtocolSpec
 from secret_sharing import(
@@ -71,19 +75,30 @@ class SMCParty:
         ):
 
         #TODO consider using match-case statement
-        if expr.type == 0:          # if expr is a scalar, return the value of scalar
-            return expr.value
-        elif expr.type == 1:        
-            return 1                #this is a placeholder TODO talk about this line
-        elif expr.type == 2:        #if expression is addition, add its operands
-            return self.process_expression(expr.operand1) + self.process_expression(expr.operand2)
-        elif expr.type == 3:       #if expression is addition, subtract its operands
-            return self.process_expression(expr.operand1) - self.process_expression(expr.operand2)
-        elif expr.type == 4: 
-            return 4 #placeholder TODO implement beaver triplet
+        if isinstance(expr, Scalar):          # if expr is a scalar, return the value of scalar
+            return self.handle_scalar(expr)
+        elif isinstance(expr, Secret):        
+            return self.handle_secret(expr)          #this is a placeholder TODO talk about this line
+        elif isinstance(expr, AddOperation):        #if expression is addition, add its operands
+            return self.handle_add(expr)
+        elif isinstance(expr, SubOperation):       #if expression is sub, subtract its operands
+            return self.handle_sub(expr)
+        elif isinstance(expr, MultOperation): 
+            return self.handle_mult(expr)
         # Call specialized methods for each expression type, and have these specialized
         # methods in turn call `process_expression` on their sub-expressions to process
         # further.
-        pass
 
     # Feel free to add as many methods as you want.
+
+    #TODO implement these methods
+    def handle_scalar(self, expression):
+        return expression.value
+    def handle_secret(self, expression):
+        pass
+    def handle_add(self, expression):
+        return self.process_expression(expression.operand1) + self.process_expression(expression.operand2)
+    def handle_sub(self, expression):
+        return self.process_expression(expression.operand1) - self.process_expression(expression.operand2)
+    def handle_mult(self, expression):
+        pass
