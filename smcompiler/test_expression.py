@@ -32,11 +32,20 @@ def test_expr_construction():
         assert expr == expected
         print("Passed!")
 
-def test_tree_print():
+def test_tree():
     for test in tree_tests:
         test.print_tree()
+        print()
+        print("==================================")
+        print()
+
+
+def test_unix_tree():
+    for test in tree_tests:
+        test.print_tree_unix()
         print("_________________")
 
 if __name__ == "__main__":
     #test_expr_construction()
-    test_tree_print()
+    test_unix_tree()
+    test_tree()

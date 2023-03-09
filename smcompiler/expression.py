@@ -71,15 +71,47 @@ class Expression:
         """Returns true iff the expression is a term."""
         return isinstance(self, Secret) or isinstance(self, Scalar)
 
-    def print_tree(self, indent: int = -1):
+    def print_tree_unix(self, indent: int = -1):
         """Prints the expression tree. """
         if(indent >= 0):
             print(" " * indent + "↳", self)
         else:
             print(self)
         if not self.is_term():
-            self.left.print_tree(indent + 2)
-            self.right.print_tree(indent + 2)
+            self.left.print_tree_unix(indent + 2)
+            self.right.print_tree_unix(indent + 2)
+    
+    def get_tree_lines(self):
+        """Prints the experssion tree like a binary tree showing the left and right childs."""
+        # No child.
+        if self.is_term():
+            line = self.__repr__()
+            width = len(line)
+            height = 1
+            middle = width // 2
+            return [line], width, height, middle
+
+        # Two children.
+        left, n, p, x = self.left.get_tree_lines()
+        right, m, q, y = self.right.get_tree_lines()
+        s = self.__repr__()
+        u = len(s)
+        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
+        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
+        if p < q:
+            left += [n * ' '] * (q - p)
+        elif q < p:
+            right += [m * ' '] * (p - q)
+        zipped_lines = zip(left, right)
+        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
+        return lines, n + m + u, max(p, q) + 2, n + u // 2
+    
+    def print_tree(self):
+        lines, *_ = self.get_tree_lines()
+        for line in lines:
+            print(line)
+
+
 
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
