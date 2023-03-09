@@ -21,7 +21,7 @@ def smc_client(client_id, prot, value_dict, queue):
     cli = SMCParty(
         client_id,
         "localhost",
-        5000,
+        8000,
         protocol_spec=prot,
         value_dict=value_dict
     )
@@ -31,7 +31,7 @@ def smc_client(client_id, prot, value_dict, queue):
 
 
 def smc_server(args):
-    run("localhost", 5000, args)
+    run("localhost", 8000, args)
 
 
 def run_processes(server_args, *client_args):
@@ -274,6 +274,35 @@ def test_suite10():
     expected = 3 + 5 * (15 + 15 * 3)
     suite(parties, expr, expected)
 
+def test_suite11():
+    """
+    f(a, b) = a - b
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+    can_secret = Secret()
+    aybars_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 14},
+        "Bob": {bob_secret: 3},
+        "Can": {can_secret: 5},
+        "Aybars": {aybars_secret: 7}
+    }
+
+    expr = (alice_secret - bob_secret + can_secret - aybars_secret)
+    expected = 14 - 3 + 5 - 7
+    suite(parties, expr, expected)
+
+tests = [
+        test_suite4, 
+        test_suite9, 
+        test_suite2,
+        test_suite11
+]
+
 # main
 if __name__ == "__main__":
-    test_suite4()
+    for test in tests:
+        test()
+        print(f"{test} has passed")

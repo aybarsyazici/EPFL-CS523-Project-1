@@ -25,11 +25,13 @@ from expression import (
 )
 from protocol import ProtocolSpec
 from secret_sharing import(
-    reconstruct_secret,
+    reconstruct_shares,
+    publish_result,
     retrieve_share,
     send_share,
     gen_share,
     Share,
+    receive_public_results
 )
 
 # Feel free to add as many imports as you want.
@@ -66,6 +68,7 @@ class SMCParty:
     def run(self) -> int:
         # Implementation of SMC protocol
         # Iterate over the secrets that this party is responsible for.
+        print(self.protocol_spec.expr)
         for secret in self.value_dict:
             # create shares of the secret
             shares = gen_share(self.value_dict[secret], len(self.protocol_spec.participant_ids))
@@ -75,8 +78,15 @@ class SMCParty:
                 send_share(share, participant, secret.id, self.comm)
         # Process the expression
         result_share = self.process_expression(self.protocol_spec.expr)
-
-
+        assert isinstance(result_share, Share)
+        print(f"SMCParty: {self.client_id} has found the result share!")
+        # Publish the result share.
+        publish_result(result_share, self.comm)
+        # Retrieve the other resulting shares.
+        all_result_shares = receive_public_results(self.comm,self.protocol_spec.participant_ids)
+        print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
+        # Reconstruct & return.
+        return reconstruct_shares(all_result_shares)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -89,20 +99,14 @@ class SMCParty:
         if isinstance(expr, Scalar):          # if expr is a scalar, return the value of scalar
             return self.handle_scalar(expr)
         elif isinstance(expr, Secret):        
-            return self.handle_secret(expr)          #this is a placeholder TODO talk about this line
+            return self.handle_secret(expr)          
         elif isinstance(expr, AddOperation):        #if expression is addition, add its operands
             return self.handle_add(expr)
-        elif isinstance(expr, SubOperation):       #if expression is sub, subtract its operands
+        elif isinstance(expr, SubOperation):       
             return self.handle_sub(expr)
         elif isinstance(expr, MultOperation): 
             return self.handle_mult(expr)
-        # Call specialized methods for each expression type, and have these specialized
-        # methods in turn call `process_expression` on their sub-expressions to process
-        # further.
 
-    # Feel free to add as many methods as you want.
-
-    #TODO implement these methods
     def handle_scalar(self, expression):
         return expression.value
     def handle_secret(self, expression):

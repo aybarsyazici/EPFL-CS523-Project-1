@@ -66,8 +66,8 @@ class Communication:
         label_san = sanitize_url_param(label)
 
         url = f"{self.base_url}/private/{client_id_san}/{receiver_id_san}/{label_san}"
-        print(f"POST {url}")
         requests.post(url, message)
+
 
 
     def retrieve_private_message(

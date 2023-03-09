@@ -32,16 +32,21 @@ class Share:
         return f"Share({self.index}, {self.value})"
 
     def __add__(self, other):
-        if isinstance(other, Scalar):
+        if isinstance(other, int):
             if self.index == 0:
-                return Share(0, self.value + other.value)
+                return Share(0, self.value + other)
             return Share(self.index, self.value)    
         #else, both elements are shares
         return Share(self.index, self.value + other.value)     
     
     
     def __sub__(self, other):
-        raise NotImplementedError("You need to implement this method.")
+        if isinstance(other, int):
+            if self.index == 0:
+                return Share(0, self.value - other)
+            return Share(self.index, self.value)    
+        #else, both elements are shares
+        return Share(self.index, self.value - other.value)  
 
     def __mul__(self, other):
         raise NotImplementedError("You need to implement this method.")
@@ -71,13 +76,12 @@ def gen_share(secret: int, num_shares: int) -> List[Share]:
     return [Share(i, s) for i, s in enumerate(share_values)]
     
 
-
-def reconstruct_secret(shares: List[Share]) -> int:
+def reconstruct_shares(shares: List[Share]) -> int:
     """Reconstruct the secret from shares."""
+    print("TO RECONSTRUCT: ", shares)
     return sum([s.value for s in shares]) % default_q
 
 def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communication) -> None:
-    print("secret_id", secret_id)
     secret_id_int = int.from_bytes(secret_id, byteorder="big")
     label = f"{secret_id_int}"
     print(f"SMCParty: Sending secret share {label}: {comm.client_id} -> {receiver_id}")
@@ -92,6 +96,20 @@ def retrieve_share(id: int, comm: Communication) -> Share:
     print(f"SMCParty: Retrieved secret share {label}: {comm.client_id} -> {share}")
     return share
 
+def publish_result(share: Share, comm: Communication):
+    """Publicly announce the final result"""
+    label = f"{comm.client_id}"
+    print(f"SMCParty: Broadcasting result share {label}: {comm.client_id} ->")
+    comm.publish_message(label, Share.serialize(share))
+
+def receive_public_results(comm: Communication, participant_ids: list):
+    public_shares = []
+    for participant in participant_ids:
+        label = f"{participant}"
+        print(f"SMCParty: Receiving result share {label}: -> {comm.client_id}")
+        payload = comm.retrieve_public_message(participant, label)
+        public_shares.append(Share.deserialize(payload))
+    return public_shares
 
 
 # Feel free to add as many methods as you want.

@@ -67,8 +67,6 @@ class Expression:
     def __hash__(self):
         return hash(self.id)
 
-    # Feel free to add as many methods as you like.      
-
 class Scalar(Expression):
     """Term representing a scalar finite field value."""
 
