@@ -42,20 +42,6 @@ class Share:
         """Restore object from its serialized representation."""
         raise NotImplementedError("You need to implement this method.")
 
-class Scalar:
-    def __init__(self, value: int):
-        self.value = value
-    def __add__(self, other):
-        if isinstance(other, Scalar):
-            return Scalar(self.value + other.value) 
-        #else, other one is a share    
-        #call addition operation of share class 
-        return other + self 
-    def __repr__(self):
-            return f"Scalar({self.value})"
-    
-
-
 
 def share_secret(secret: int, num_shares: int) -> List[Share]:
     """Generate secret shares."""
