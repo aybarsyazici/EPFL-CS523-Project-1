@@ -69,6 +69,7 @@ def reconstruct_secret(shares: List[Share]) -> int:
     return sum([s.value for s in shares]) % default_q
 
 def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communication) -> None:
+    print("secret_id", secret_id)
     secret_id_int = int.from_bytes(secret_id, byteorder="big")
     label = f"{secret_id_int}"
     print(f"SMCParty: Sending secret share {label}: {comm.client_id} -> {receiver_id}")
@@ -77,9 +78,10 @@ def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communicati
 def retrieve_share(id: int, comm: Communication) -> Share:
     """Retrieve a share from the server."""
     secret_id_int = int.from_bytes(id, byteorder="big")
-    print(f"SMCParty: Retrieving secret share {secret_id_int}: {comm.client_id}")
-    share = Share.deserialize(comm.retrieve_private_message(secret_id_int))
-    print(f"SMCParty: Retrieved secret share {secret_id_int}: {comm.client_id} -> {share}")
+    label = f"{secret_id_int}"
+    print(f"SMCParty: Retrieving secret share {label}: {comm.client_id}")
+    share = Share.deserialize(comm.retrieve_private_message(label))
+    print(f"SMCParty: Retrieved secret share {label}: {comm.client_id} -> {share}")
     return share
 
 

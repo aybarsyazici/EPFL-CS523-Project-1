@@ -66,7 +66,7 @@ class Communication:
         label_san = sanitize_url_param(label)
 
         url = f"{self.base_url}/private/{client_id_san}/{receiver_id_san}/{label_san}"
-        # print(f"POST {url}")
+        print(f"POST {url}")
         requests.post(url, message)
 
 
@@ -79,9 +79,9 @@ class Communication:
         """
 
         client_id_san = sanitize_url_param(self.client_id)
-        #label_san = sanitize_url_param(label)
+        label_san = sanitize_url_param(label)
 
-        url = f"{self.base_url}/private/{client_id_san}/{label}"
+        url = f"{self.base_url}/private/{client_id_san}/{label_san}"
         # We can either use a websocket, or do some polling, but websockets would require asyncio.
         # So we are doing polling to avoid introducing a new programming paradigm.
         while True:
