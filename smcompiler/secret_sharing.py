@@ -7,6 +7,8 @@ import random
 
 from typing import List
 
+from expression import Scalar
+
 
 # NOTE: Keep this large enough to pass the tests.
 default_q = 520633 #10337
@@ -30,8 +32,14 @@ class Share:
         return f"Share({self.index}, {self.value})"
 
     def __add__(self, other):
-        raise NotImplementedError("You need to implement this method.")
-
+        if isinstance(other, Scalar):
+            if self.index == 0:
+                return Share(0, self.value + other.value)
+            return Share(self.index, self.value)    
+        #else, both elements are shares
+        return Share(self.index, self.value + other.value)     
+    
+    
     def __sub__(self, other):
         raise NotImplementedError("You need to implement this method.")
 
