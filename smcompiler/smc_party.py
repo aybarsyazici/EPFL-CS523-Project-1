@@ -121,23 +121,14 @@ class SMCParty:
     def handle_add(self, expression):
         leftSide = self.process_expression(expression.left)
         rightSide = self.process_expression(expression.right)
-        # if leftside is int and rightside is share swap places
-        if isinstance(leftSide, int) and isinstance(rightSide, Share):
-            return rightSide + leftSide
         return leftSide + rightSide
     def handle_sub(self, expression):
         leftSide = self.process_expression(expression.left)
         rightSide = self.process_expression(expression.right)
-        # if leftside is int and rightside is share swap places
-        if isinstance(leftSide, int) and isinstance(rightSide, Share):
-            return rightSide - leftSide
         return leftSide - rightSide
     def handle_mult(self, expression):
         l_expression = self.process_expression(expression.left)
         r_expression = self.process_expression(expression.right)
-        # if leftside is int and rightside is share swap places
-        if isinstance(l_expression, int) and isinstance(r_expression, Share):
-            return r_expression * l_expression
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:

@@ -8,7 +8,7 @@ MODIFY THIS FILE.
 from expression import Secret, Scalar, Expression
 
 left_side_tests: list[Expression] = [
-    Scalar(5) * Secret(1),
+    Scalar(10) + Scalar(5) * Secret(1),
 ]
     
 tests = {

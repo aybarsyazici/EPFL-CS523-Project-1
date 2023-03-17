@@ -53,7 +53,6 @@ class Share:
         #else, both elements are shares
         return Share(self.index, self.value + other.value)     
     
-    
     def __sub__(self, other):
         if isinstance(other, int):
             if self.index == 0:
@@ -61,10 +60,10 @@ class Share:
             return Share(self.index, self.value)    
         #else, both elements are shares
         return Share(self.index, self.value - other.value)
-
+    
     def __mul__(self, other):
         if isinstance(other, int):
-            return Share(self.index, (self.value * other)%default_q)
+            return Share(self.index, self.value * other)
         else:
             if(self.d is None): raise ValueError("d is not set, should NEVER happen")
             if(self.e is None): raise ValueError("e is not set, should NEVER happen")
@@ -74,6 +73,23 @@ class Share:
             c_share = self.beaver_triplets[2]
             new_value = (c_share + self.d*self.e + b_share*self.d + a_share*self.e)
             return Share(self.index, new_value.value)
+
+    # Override reverse add
+    def __radd__(self, other):
+        if(not isinstance(other, int)): raise ValueError("Should not happen")
+        return self.__add__(other)
+    
+    # Override reverse sub
+    def __rsub__(self, other):
+        if(not isinstance(other, int)): raise ValueError("Should not happen")
+        if self.index == 0:
+            return Share(0, other - self.value)
+        return Share(self.index, 0-self.value)   
+
+    # Override reverse mul
+    def __rmul__(self, other):
+        if(not isinstance(other, int)): raise ValueError("Should not happen")
+        return self.__mul__(other) 
 
     def serialize(self):
         """Convert object to a serialized representation."""

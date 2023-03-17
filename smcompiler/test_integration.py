@@ -71,6 +71,7 @@ def suite(parties, expr, expected):
     results = run_processes(participants, *clients)
 
     for result in results:
+        #print(f"Result: {result} (expected: {expected})")
         assert result == expected
 
 
@@ -315,7 +316,7 @@ def test_suite12():
 
 def test_suite7_modified():
     """
-    f(a, b, c) = (a ∗ b) + (b ∗ c) + (c ∗ a)
+    f(a, b, c) = (a ∗ b) + (a * b) + ((b ∗ c) + (b * c) - ((c ∗ a) + (c * a))) + (a ∗ a)
     """
     alice_secret = Secret()
     bob_secret = Secret()
@@ -329,16 +330,16 @@ def test_suite7_modified():
 
     expr = (
         (alice_secret * bob_secret) + (alice_secret * bob_secret) +
-        (bob_secret * charlie_secret) + (bob_secret * charlie_secret) +
-        (charlie_secret * alice_secret) + (charlie_secret * alice_secret)
+        ((bob_secret * charlie_secret) + (bob_secret * charlie_secret) -
+        ((charlie_secret * alice_secret) + (charlie_secret * alice_secret)))
         + (alice_secret * alice_secret)
     )
-    expected = ((3 * 14) + (3 * 14) + (14 * 2) + (14 * 2) + (2 * 3) + (2 * 3) + (3 * 3))
+    expected = ((3 * 14) + (3 * 14) + ((14 * 2) + (14 * 2) - ((2 * 3) + (2 * 3))) + (3 * 3))
     suite(parties, expr, expected)
 
 def simple_custom_test():
     """
-    f(a,b) = 2*a + 3*b
+    f(a,b) = 5*(3 + (a * b))
     
     """
     alice_secret = Secret()
@@ -351,6 +352,75 @@ def simple_custom_test():
 
     expr = Scalar(5)*(Scalar(3) + (alice_secret * bob_secret))
     expected = 5*(3 + (3 * 14))
+    suite(parties, expr, expected)
+
+def simple_substraction():
+    """
+    f(a,b) = (a - 20) + (b-10)
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 13},
+        "Bob": {bob_secret: 18}
+    }
+
+    expr =  (alice_secret -  Scalar(20)) + (bob_secret - Scalar(10))
+    expected = (13-20) + (18-10)
+    suite(parties, expr, expected)
+
+
+def simple_substraction_2():
+    """
+    f(a,b) = (a - 10) + (b-10)
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 13},
+        "Bob": {bob_secret: 18}
+    }
+
+    expr =  (alice_secret -  Scalar(10)) * (bob_secret - Scalar(10))
+    expected = (13-10) * (18-10)
+    suite(parties, expr, expected)
+
+def simple_substraction_3():
+    """
+    f(a,b) = (10 - a) + (10 - b)
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 3},
+        "Bob": {bob_secret: 8}
+    }
+
+    expr =  (Scalar(10) - alice_secret) + (Scalar(10) - bob_secret)
+    expected = (10-3) + (10 - 8)
+    suite(parties, expr, expected)
+
+def simple_substraction_4():
+    """
+    f(a,b) = (10 - a) * (10 - b)
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 3},
+        "Bob": {bob_secret: 8}
+    }
+
+    expr =  (Scalar(10) - alice_secret) * (Scalar(10) - bob_secret)
+    expected = (10-3) * (10 - 8)
     suite(parties, expr, expected)
 
 def test_multi_secret_1():
@@ -368,8 +438,6 @@ def test_multi_secret_1():
         "Bob": {bob_secrets[0]: 14, bob_secrets[1]: 2, bob_secrets[2]: 5, bob_secrets[3]: 7, bob_secrets[4]: 9, bob_secrets[5]: 11},
         "Charlie": {charlie_secret: 2}
     }
-
-    # 
     expr = (
         alice_secrets[1] + (charlie_secret * (Scalar(8) + ((alice_secrets[0] - bob_secrets[0] * alice_secrets[2]) + Scalar(3) * (alice_secrets[1] + bob_secrets[1]) * Scalar(2) * (alice_secrets[2] - bob_secrets[2]) + Scalar(10) - ((bob_secrets[3] * bob_secrets[4]) + (bob_secrets[5] - charlie_secret)))))
     )
@@ -386,6 +454,10 @@ tests = [
         test_suite8,
         test_suite7_modified,
         simple_custom_test,
+        simple_substraction,
+        simple_substraction_2,
+        simple_substraction_3,
+        simple_substraction_4,
         test_multi_secret_1,
 ]
 
