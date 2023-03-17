@@ -32,7 +32,8 @@ class TrustedParamGenerator:
         self.a = -1
         self.b = -1
         self.c = -1
-
+        self.triplets = {}
+        self.tripletIndeces = {}
 
     def add_participant(self, participant_id: str) -> None:
         """
@@ -44,11 +45,25 @@ class TrustedParamGenerator:
         """
         Retrieve a triplet of shares for a given client_id.
         """
-        raise NotImplementedError("You need to implement this method.")
+        if client_id not in self.participant_ids:
+            raise ValueError("Client not registered")
+        if op_id not in self.triplets:
+            self.generate_new_triplet(op_id)
+        currentIndex = self.tripletIndeces[op_id]
+        toReturn = (self.triplets[op_id][0][currentIndex], self.triplets[op_id][1][currentIndex], self.triplets[op_id][2][currentIndex])
+        self.tripletIndeces[op_id] += 1
+        return toReturn
 
-    def generate_new_triplet(self):
-        self.a = random.randint(0,1000000)
-        self.b = random.randint(0,1000000)
-        self.c = self.a * self.b
+    def generate_new_triplet(self, secret_id: str) -> None:
+        self.a = random.randint(0,520633-1) #default_q
+        self.b = random.randint(0,520633-1) #default_q
+        self.c = (self.a * self.b) % 520633 #default_q
+        print(f"Generated new triplet: {self.a}, {self.b}, {self.c} for {secret_id}")
+        shares = []
+        for secret in [self.a,self.b,self.c]:
+            shares.append(gen_share(secret, len(self.participant_ids)))
+        self.triplets[secret_id] = shares
+        self.tripletIndeces[secret_id] = 0
+        
 
     # Feel free to add as many methods as you want.

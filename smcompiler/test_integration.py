@@ -314,11 +314,38 @@ def test_suite12():
     expected = 14 - 3 + 5 - 7
     suite(parties, expr, expected)
 
+def test_suite7_modified():
+    """
+    f(a, b, c) = (a ∗ b) + (b ∗ c) + (c ∗ a)
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+    charlie_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 3},
+        "Bob": {bob_secret: 14},
+        "Charlie": {charlie_secret: 2}
+    }
+
+    expr = (
+        (alice_secret * bob_secret) + (alice_secret * bob_secret) +
+        (bob_secret * charlie_secret) + (bob_secret * charlie_secret) +
+        (charlie_secret * alice_secret) + (charlie_secret * alice_secret)
+        + (alice_secret * alice_secret)
+    )
+    expected = ((3 * 14) + (3 * 14) + (14 * 2) + (14 * 2) + (2 * 3) + (2 * 3) + (3 * 3))
+    suite(parties, expr, expected)
+
 tests = [
         test_suite4, 
         test_suite9, 
         test_suite2,
-        test_suite11
+        test_suite11,
+        test_suite10,
+        test_suite7,
+        test_suite8,
+        test_suite7_modified,
 ]
 
 # main

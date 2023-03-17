@@ -153,7 +153,7 @@ This repository contains the skeleton code for Parts 1 and 3:
 * `stroll.py`—Source code that you have to complete.
 * `client.py`—Client CLI calling classes and methods defined in `stroll.py`.
 * `server.py`—Server CLI calling classes and methods defined in `stroll.py`.
-* `serialization.py`—Extends the library `jsonpickle` to serialize python
+* `serialization.py`—Extends the library `jsonpickle` to  python
   objects.
 * `fingerprinting.py`—skeleton for Part 3.
 * `requirements.txt`—Required Python libraries.

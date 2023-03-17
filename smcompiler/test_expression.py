@@ -22,7 +22,9 @@ tree_tests: list[Expression] = [
     (Secret(1) + Secret(2)),
     (Secret(1) * Secret(2) + Secret(3)),
     (Secret(1) * (Secret(2) + Secret(3) * Scalar(4))),
-    ((Secret(5) - Secret(2)) * (Secret(8) + Secret(14)))
+    ((Secret(5) - Secret(2)) * (Secret(8) + Secret(14))),
+    (Secret(1) + Secret(2) * (Scalar(15) + Scalar(15) * Scalar(3))),
+    ((Secret(1) * Secret(2)) + (Secret(3) * Secret(4))) + (Secret(5) * Secret(6)),
 ]
 
 # Example test, you can adapt it to your needs.
@@ -47,5 +49,5 @@ def test_unix_tree():
 
 if __name__ == "__main__":
     #test_expr_construction()
-    test_unix_tree()
+    #test_unix_tree()
     test_tree()
