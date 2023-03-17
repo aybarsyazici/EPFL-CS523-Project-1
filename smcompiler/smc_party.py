@@ -75,7 +75,7 @@ class SMCParty:
         # join ttp
         # publish i joined msg
         # check for other participants
-        print(self.protocol_spec.expr)
+        print('Expression',self.protocol_spec.expr)
         for secret in self.value_dict:
             # create shares of the secret
             shares = gen_share(self.value_dict[secret], len(self.protocol_spec.participant_ids))
@@ -119,12 +119,25 @@ class SMCParty:
     def handle_secret(self, expression):
         return retrieve_share(expression.id, self.comm)
     def handle_add(self, expression):
-        return self.process_expression(expression.left) + self.process_expression(expression.right)
+        leftSide = self.process_expression(expression.left)
+        rightSide = self.process_expression(expression.right)
+        # if leftside is int and rightside is share swap places
+        if isinstance(leftSide, int) and isinstance(rightSide, Share):
+            return rightSide + leftSide
+        return leftSide + rightSide
     def handle_sub(self, expression):
-        return self.process_expression(expression.left) - self.process_expression(expression.right)
+        leftSide = self.process_expression(expression.left)
+        rightSide = self.process_expression(expression.right)
+        # if leftside is int and rightside is share swap places
+        if isinstance(leftSide, int) and isinstance(rightSide, Share):
+            return rightSide - leftSide
+        return leftSide - rightSide
     def handle_mult(self, expression):
         l_expression = self.process_expression(expression.left)
         r_expression = self.process_expression(expression.right)
+        # if leftside is int and rightside is share swap places
+        if isinstance(l_expression, int) and isinstance(r_expression, Share):
+            return r_expression * l_expression
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:

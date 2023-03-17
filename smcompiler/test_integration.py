@@ -65,7 +65,6 @@ def run_processes(server_args, *client_args):
 
 def suite(parties, expr, expected):
     participants = list(parties.keys())
-
     prot = ProtocolSpec(expr=expr, participant_ids=participants)
     clients = [(name, prot, value_dict) for name, value_dict in parties.items()]
 
@@ -337,6 +336,46 @@ def test_suite7_modified():
     expected = ((3 * 14) + (3 * 14) + (14 * 2) + (14 * 2) + (2 * 3) + (2 * 3) + (3 * 3))
     suite(parties, expr, expected)
 
+def simple_custom_test():
+    """
+    f(a,b) = 2*a + 3*b
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 3},
+        "Bob": {bob_secret: 14}
+    }
+
+    expr = Scalar(5)*(Scalar(3) + (alice_secret * bob_secret))
+    expected = 5*(3 + (3 * 14))
+    suite(parties, expr, expected)
+
+def test_multi_secret_1():
+    """
+
+    f(a1, a2, a3, b1, b2, b3, b4, b5, b6, c) = a2+(c* (8 + ((a1 - b1 * a3) + 3*(a2 + b2) * 2*(a3 - b3) + 10 - ((b4 * b5) + (b6 - c)))))
+    
+    """
+    alice_secrets = [Secret(), Secret(), Secret()]
+    bob_secrets = [Secret(), Secret(), Secret(), Secret(), Secret(), Secret()]
+    charlie_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secrets[0]: 3, alice_secrets[1]: 57, alice_secrets[2]: 43},
+        "Bob": {bob_secrets[0]: 14, bob_secrets[1]: 2, bob_secrets[2]: 5, bob_secrets[3]: 7, bob_secrets[4]: 9, bob_secrets[5]: 11},
+        "Charlie": {charlie_secret: 2}
+    }
+
+    # 
+    expr = (
+        alice_secrets[1] + (charlie_secret * (Scalar(8) + ((alice_secrets[0] - bob_secrets[0] * alice_secrets[2]) + Scalar(3) * (alice_secrets[1] + bob_secrets[1]) * Scalar(2) * (alice_secrets[2] - bob_secrets[2]) + Scalar(10) - ((bob_secrets[3] * bob_secrets[4]) + (bob_secrets[5] - charlie_secret)))))
+    )
+    expected = 57 + (2 * (8 + ((3 - 14 * 43) + 3 * (57 + 2) * 2 * (43 - 5) + 10 - ((7 * 9) + (11 - 2)))))
+    suite(parties, expr, expected)
+
 tests = [
         test_suite4, 
         test_suite9, 
@@ -346,6 +385,8 @@ tests = [
         test_suite7,
         test_suite8,
         test_suite7_modified,
+        simple_custom_test,
+        test_multi_secret_1,
 ]
 
 # main

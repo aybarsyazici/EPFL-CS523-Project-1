@@ -7,6 +7,10 @@ MODIFY THIS FILE.
 
 from expression import Secret, Scalar, Expression
 
+left_side_tests: list[Expression] = [
+    Scalar(5) * Secret(1),
+]
+    
 tests = {
     repr(Secret(1) + Secret(2)): "Secret(1) + Secret(2)",
     repr(Secret(2) * Secret(1)): "Secret(2) * Secret(1)",
@@ -41,6 +45,13 @@ def test_tree():
         print("==================================")
         print()
 
+def left_side():
+    for test in left_side_tests:
+        test.print_tree()
+        print()
+        print("==================================")
+        print()
+
 
 def test_unix_tree():
     for test in tree_tests:
@@ -50,4 +61,5 @@ def test_unix_tree():
 if __name__ == "__main__":
     #test_expr_construction()
     #test_unix_tree()
-    test_tree()
+    #test_tree()
+    left_side()
