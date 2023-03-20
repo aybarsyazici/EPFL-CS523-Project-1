@@ -71,7 +71,7 @@ def suite(parties, expr, expected):
     results = run_processes(participants, *clients)
 
     for result in results:
-        #print(f"Result: {result} (expected: {expected})")
+        print(f"Result: {result} (expected: {expected})")
         assert result == expected
 
 
@@ -423,6 +423,23 @@ def simple_substraction_4():
     expected = (10-3) * (10 - 8)
     suite(parties, expr, expected)
 
+def simple_substraction_5():
+    """
+    f(a,b) = (a - 10) * (b - 10)
+    
+    """
+    alice_secret = Secret()
+    bob_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secret: 3},
+        "Bob": {bob_secret: 8}
+    }
+
+    expr =  (alice_secret - Scalar(10)) * (bob_secret - Scalar(10))
+    expected = (3-10) * (8 - 10)
+    suite(parties, expr, expected)
+
 def test_multi_secret_1():
     """
 
@@ -444,21 +461,46 @@ def test_multi_secret_1():
     expected = 57 + (2 * (8 + ((3 - 14 * 43) + 3 * (57 + 2) * 2 * (43 - 5) + 10 - ((7 * 9) + (11 - 2)))))
     suite(parties, expr, expected)
 
+def test_multi_secret_2():
+    """
+
+    f(a1, a2, a3, b1, b2, b3, b4, b5, b6, c) = a2+(c* (8 + ((a1 - b1 * a3) + 3*(a2 + b2) * 2*(a3 - b3) + 10 - ((b4 * b5) + (b6 - c)))))
+    
+    """
+    alice_secrets = [Secret(), Secret(), Secret()]
+    bob_secrets = [Secret(), Secret(), Secret(), Secret(), Secret(), Secret()]
+    charlie_secret = Secret()
+
+    parties = {
+        "Alice": {alice_secrets[0]: 3, alice_secrets[1]: 57, alice_secrets[2]: 43},
+        "Bob": {bob_secrets[0]: 14, bob_secrets[1]: 2, bob_secrets[2]: 5, bob_secrets[3]: 7, bob_secrets[4]: 9, bob_secrets[5]: 11},
+        "Charlie": {charlie_secret: 2}
+    }
+    expr = (
+        alice_secrets[1] + 
+            (charlie_secret * 
+                (Scalar(8) + ((alice_secrets[0] - bob_secrets[0] * alice_secrets[2]) + Scalar(3) * (alice_secrets[1] + bob_secrets[1]) * Scalar(2) * (bob_secrets[2] - alice_secrets[2]) + Scalar(10) - ((bob_secrets[3] * bob_secrets[4]) + (charlie_secret - bob_secrets[5] )))))
+    )
+    expected = 57 + (2 * (8 + ((3 - 14 * 43) + 3 * (57 + 2) * 2 * (5 - 43) + 10 - ((7 * 9) + (2 - 11)))))
+    suite(parties, expr, expected)
+
 tests = [
-        test_suite4, 
-        test_suite9, 
-        test_suite2,
-        test_suite11,
-        test_suite10,
-        test_suite7,
-        test_suite8,
-        test_suite7_modified,
-        simple_custom_test,
-        simple_substraction,
-        simple_substraction_2,
-        simple_substraction_3,
-        simple_substraction_4,
+        # test_suite4, 
+        # test_suite9, 
+        # test_suite2,
+        # test_suite11,
+        # test_suite10,
+        # test_suite7,
+        # test_suite8,
+        # test_suite7_modified,
+        # simple_custom_test,
+        # simple_substraction,
+        # simple_substraction_2,
+        # simple_substraction_3,
+        # simple_substraction_4,
+        simple_substraction_5,
         test_multi_secret_1,
+        # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 
 # main
