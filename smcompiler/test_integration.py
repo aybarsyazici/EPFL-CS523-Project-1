@@ -484,6 +484,69 @@ def test_multi_secret_2():
     expected = 57 + (2 * (8 + ((3 - 14 * 43) + 3 * (57 + 2) * 2 * (5 - 43) + 10 - ((7 * 9) + (2 - 11)))))
     suite(parties, expr, expected)
 
+
+def test_eval_1():
+
+    """ 
+    f() = (5 - (5*a1 + 9 - (3*b1 + b2*(6 - a2) + (c2*c1) - (a3*5))))
+    """
+
+    alice_secrets = [Secret(), Secret(), Secret()]
+    bob_secrets = [Secret(), Secret()]
+    charlie_secrets = [Secret(),Secret()]
+
+    parties = {
+        "Alice": {alice_secrets[0]: 3, alice_secrets[1]: 57, alice_secrets[2]: 43},
+        "Bob": {bob_secrets[0]: 14, bob_secrets[1]: 2},
+        "Charlie": {charlie_secrets[0]: 12,charlie_secrets[1]: 9 }
+    }
+
+    expr = (Scalar(5) - (Scalar(5)*alice_secrets[0] + Scalar(9) - (Scalar(3)*bob_secrets[0] + bob_secrets[1]*(Scalar(6)-alice_secrets[1]) + (charlie_secrets[1]*charlie_secrets[0]) - (alice_secrets[2] * Scalar(5)))))
+    expected = (5 - (5*3 + 9 - (3*14 + 2*(6 - 57) + (9*12) - (43*5))))
+    suite(parties, expr, expected)
+
+
+def test_eval_2():
+    """
+    f() = (a1 * 31 * b1 * 5 * c1 * 44 * d1) * (5 - a2 - 8 + b2 + 99 - c2 - 55 + d2 - 23) 
+    """
+
+    walter_secrets = [Secret(), Secret()]
+    saul_secrets = [Secret(), Secret()]
+    mike_secrets = [Secret(),Secret()]
+    gus_secrets = [Secret(), Secret()]
+
+    parties = {
+        "Walter": {walter_secrets[0]: 3, walter_secrets[1]: 5},
+        "Saul": {saul_secrets[0]: 2, saul_secrets[1]: 2},
+        "Mike": {mike_secrets[0]: 1, mike_secrets[1]: 4 },
+        "Gus": {gus_secrets[0]: 3, gus_secrets[1]: 2}
+    }
+
+    expr = (walter_secrets[0] * Scalar(31) * saul_secrets[0] * Scalar(5) * mike_secrets[0] * Scalar(44) * gus_secrets[0]) * (Scalar(5) - walter_secrets[1] - Scalar(8) + saul_secrets[1] + Scalar(99) - mike_secrets[1] - Scalar(55) + gus_secrets[1] - Scalar(23))
+    expected = ( 3 * 31 * 14 * 5 * 12 * 44 * 66) * (5 - 57 - 8 + 2 + 99 - 9 - 55 + 321 - 23) 
+    suite(parties, expr, expected)
+
+
+def test_eval_3():
+    """
+    f() = (99999 - (a1 - (5 * (a2 + (88 - b1 * (c1 + 7 * (88 - c2)))))))
+    """
+
+    walter_secrets = [Secret(), Secret()]
+    saul_secrets = [Secret()]
+    mike_secrets = [Secret(),Secret()]
+
+    parties = {
+        "Walter": {walter_secrets[0]: 9, walter_secrets[1]: 6},
+        "Saul": {saul_secrets[0]: 2},
+        "Mike": {mike_secrets[0]: 5, mike_secrets[1]: 83 },
+    }
+
+    expr = (Scalar(99999) - (walter_secrets[0] - (Scalar(5) * (walter_secrets[1] + (Scalar(88) - saul_secrets[0] * (mike_secrets[0] + Scalar(7) * (Scalar(88) - mike_secrets[1])))))))
+    expected = (99999 - (9 - (5 * (6 + (88 - 2 * (5 + 7 * (88 - 83)))))))
+    suite(parties, expr, expected)
+
 tests = [
         # test_suite4, 
         # test_suite9, 
@@ -498,8 +561,9 @@ tests = [
         # simple_substraction_2,
         # simple_substraction_3,
         # simple_substraction_4,
-        simple_substraction_5,
-        test_multi_secret_1,
+        #simple_substraction_5,
+        #test_multi_secret_1,
+        test_eval_3
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 
