@@ -161,7 +161,7 @@ def pc_test3():
 
     expr = (p1_secrets[0] + Scalar(5)) * (Scalar(8) - p2_secrets[0]) + (p3_secrets[0] * Scalar(2)) - (p4_secrets[0] - p1_secrets[1]) * p2_secrets[1] - p3_secrets[1] + (Scalar(11) * Scalar(6)) + (Scalar(99) - Scalar(6)*p4_secrets[1]) - p1_secrets[2] + p2_secrets[2] * (p3_secrets[2] - p4_secrets[2])
     expected = (13 + 5) * (8 - 8) + (10 * 2) - (16 - 20) * 14 - 17 + (11 * 6) + (99 - 6*12) - 9 + 2 * (11 - 9)
-    
+
     suite(parties, expr, expected)
 
 
