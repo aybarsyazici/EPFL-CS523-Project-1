@@ -102,7 +102,7 @@ class SMCParty:
         reconstructed = reconstruct_shares(all_result_shares)
         self.elapsed_time = time.time() - start
         # Return the reconstructed results with the calculated metrics
-        return (reconstructed, self.bytes_sent, self.bytes_received, self.elapsed_time)
+        return (reconstructed)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:

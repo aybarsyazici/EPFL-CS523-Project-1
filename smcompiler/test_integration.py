@@ -548,22 +548,27 @@ def test_eval_3():
     suite(parties, expr, expected)
 
 tests = [
-        # test_suite4, 
-        # test_suite9, 
-        # test_suite2,
-        # test_suite11,
-        # test_suite10,
-        # test_suite7,
-        # test_suite8,
-        # test_suite7_modified,
+        test_suite1,
+        test_suite2,
+        test_suite3,
+        test_suite4,
+        test_suite5,
+        test_suite6,
+        test_suite7,
+        test_suite8,
+        test_suite9,
+        test_suite10, 
+        test_suite11,
+        test_suite12,
+        test_suite7_modified,
         # simple_custom_test,
         # simple_substraction,
-        # simple_substraction_2,
-        # simple_substraction_3,
-        # simple_substraction_4,
-        #simple_substraction_5,
-        #test_multi_secret_1,
-        test_eval_3
+        simple_substraction_2,
+        simple_substraction_3,
+        simple_substraction_4,
+        simple_substraction_5,
+        test_multi_secret_1,
+        # test_eval_3
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 

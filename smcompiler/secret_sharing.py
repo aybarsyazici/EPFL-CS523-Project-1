@@ -43,7 +43,7 @@ class Share:
 
     def __repr__(self):
         # Helps with debugging.
-        return f"Share({self.index}, {self.value})"
+        return f"Share({self.id}, {self.index}, {self.value})"
 
     def __add__(self, other):
         if isinstance(other, int):
@@ -93,29 +93,29 @@ class Share:
 
     def serialize(self):
         """Convert object to a serialized representation."""
-        s = f"{self.index}|{self.value}"
+        s = f"{self.index}|{self.value}|{self.id}"
         return s
     
     def serialize_bytes(self):
         """Convert object to a serialized representation."""
-        s = f"{self.index}|{self.value}"
+        s = f"{self.index}|{self.value}|{self.id}"
         return s.encode('utf-8')
 
     @staticmethod
     def deserialize(serialized) -> Share:
         """Restore object from its serialized representation."""
-        index, value = serialized.split("|")
-        return Share(int(index), int(value))
+        index, value, id = serialized.split("|")
+        return Share(int(index), int(value), id=id)
 
     @staticmethod
     def deserialize_bytes(serialized) -> Share:
         """Restore object from its serialized representation."""
-        index, value = serialized.split(b"|")
-        return Share(int(index), int(value))
+        index, value, id = serialized.split(b"|")
+        return Share(int(index), int(value), id=id.decode('utf-8'))
 
 
 
-def gen_share(secret: int, num_shares: int) -> List[Share]:
+def gen_share(secret: int, num_shares: int, secret_id: Optional[bytes] = None) -> List[Share]:
     """ Given a secret and the number of participants in the SMC protocol,
     generate the secret shares.
     """
@@ -124,6 +124,8 @@ def gen_share(secret: int, num_shares: int) -> List[Share]:
     # Calculate s_0 and prepend.
     share_values = [(secret - sum(share_values)) % default_q] + share_values
     # Return the shares s_0, s_1, ..., s_{N-1}
+    if secret_id is not None:
+        return [Share(i, s, id=secret_id) for i, s in enumerate(share_values)]
     return [Share(i, s) for i, s in enumerate(share_values)]
     
 
@@ -133,7 +135,7 @@ def reconstruct_shares(shares: List[Share]) -> int:
     return sum([s.value for s in shares]) % default_q
 
 #sends serialized message and returns the length of the serialized message
-def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communication) -> None:
+def send_share(share: Share, receiver_id: str, secret_id: bytes, comm: Communication) -> None:
     secret_id_int = int.from_bytes(secret_id, byteorder="big")
     label = f"{secret_id_int}"
     print(f"SMCParty: Sending secret share {label}: {comm.client_id} -> {receiver_id}")
@@ -141,7 +143,7 @@ def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communicati
     comm.send_private_message(receiver_id, label, serialized)
     return len(serialized)
 
-def retrieve_share(id: int, comm: Communication) -> Share:
+def retrieve_share(id: bytes, comm: Communication) -> Share:
     """Retrieve a share from the server."""
     secret_id_int = int.from_bytes(id, byteorder="big")
     label = f"{secret_id_int}"
@@ -210,6 +212,21 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
     print(f"SMCParty: Finished getting triplet shares: -> {comm.client_id} d: {d} e: {e}")
     return d, e, total_bytes
 
+# For use case
+def publish_result_for_class(share: Share, comm: Communication, lecture: str):
+    """Publicly announce the final result"""
+    label = f"{comm.client_id}|{lecture}"
+    print(f"SMCParty: Broadcasting result share {label}: {comm.client_id} ->")
+    serialized = Share.serialize_bytes(share)
+    comm.publish_message(label, serialized)
 
+def receive_public_results_for_class(comm: Communication, participant_ids: list, lecture: str):
+    public_shares = []
+    for participant in participant_ids:
+        label = f"{participant}|{lecture}"
+        print(f"SMCParty: Receiving result share {label}: -> {comm.client_id}")
+        payload = comm.retrieve_public_message(participant, label)
+        public_shares.append(Share.deserialize_bytes(payload))
+    return public_shares
 
 # Feel free to add as many methods as you want.
