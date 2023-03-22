@@ -25,10 +25,7 @@ from secret_sharing import (
 
 class Class:
     # Represents the class students belong to
-    # it has a list of lectures and a dictionary of students
-    # the dictionary of students contain the student name as key and it's secrets as a list.
-    # Where the first index of the list is the grade student got from first lecture, second index is the second grade
-    # and so on.
+    # it has a list of lectures and a list of students
 
     # Constuctor
     def __init__(self, lectures: list, students: list):
@@ -38,6 +35,8 @@ class Class:
 class Student():
     
     # Constuctor
+    # Contains the id of the student, the class he belongs to and the values of the secrets he has
+    # We'll try to fill means and standard_deviation dictionaries by using SMC
     def __init__(self, client_id, server_host, server_port, cl: Class, value_dict):
         self.comm = Communication(server_host, server_port, client_id)
         self.client_id = client_id
@@ -46,7 +45,6 @@ class Student():
         self.shares = {}
         self.means = {}
         self.standard_deviations = {}
-        self.maxs = {}
         self.tripletIndex = 0
 
     
