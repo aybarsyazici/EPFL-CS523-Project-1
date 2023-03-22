@@ -5,11 +5,11 @@ You can *add* new tests here, but it is best to  add them to a new test file.
 ALL EXISTING TESTS IN THIS SUITE SHOULD PASS WITHOUT ANY MODIFICATION TO THEM.
 """
 
+from functools import reduce
 import time
 from multiprocessing import Process, Queue
-
 import pytest
-
+from secret_sharing import default_q
 from expression import Scalar, Secret
 from protocol import ProtocolSpec
 from server import run
@@ -547,28 +547,79 @@ def test_eval_3():
     expected = (99999 - (9 - (5 * (6 + (88 - 2 * (5 + 7 * (88 - 83)))))))
     suite(parties, expr, expected)
 
+def test_lots_of_parties():
+    """
+    f() = (a1 + b1 + c1 + d1 + e1 + f1 + g1 + h1 + i1 + j1 + k1 + l1 + m1 + n1 + o1 + p1 + q1 + r1 + s1 + t1 + u1 + v1 + w1 + x1 + y1 + z1)
+    """
+
+    parties = {}
+    secrets = []
+    for i in range(26):
+        secret = Secret()
+        parties[chr(ord('a') + i)] = {secret: i}
+        secrets.append(secret)
+    
+    expr = reduce(lambda x, y: x + y, secrets)
+    expected = sum(range(26))
+    suite(parties, expr, expected)
+
+def test_lots_of_parties_multiplication():
+    """
+    f() = (a1 * b1 * c1 * d1 * e1 * f1 * g1 * h1 * i1 * j1 * k1 * l1 * m1 * n1 * o1 * p1 * q1 * r1 * s1 * t1 * u1 * v1 * w1 * x1 * y1 * z1)
+    """
+
+    parties = {}
+    secrets = []
+    for i in range(26):
+        secret = Secret()
+        parties[chr(ord('a') + i)] = {secret: i}
+        secrets.append(secret)
+    
+    expr = reduce(lambda x, y: x * y, secrets)
+    expected = reduce(lambda x, y: x * y, range(26))
+    suite(parties, expr, expected)
+
+def test_lots_of_parties_multiplication_2():
+    """
+    f() = (a1 * b1 * c1 * d1 * e1 * f1 * g1 * h1 * i1 * j1 * k1 * l1 * m1 * n1 * o1 * p1 * q1 * r1 * s1 * t1 * u1 * v1 * w1 * x1 * y1 * z1)
+    """
+
+    parties = {}
+    secrets = []
+    for i in range(1,26):
+        secret = Secret()
+        parties[chr(ord('a') + i)] = {secret: i}
+        secrets.append(secret)
+    
+    expr = reduce(lambda x, y: x * y, secrets)
+    expected = reduce(lambda x, y: (x * y)%default_q, range(1,26))
+    suite(parties, expr, expected)
+
 tests = [
-        test_suite1,
-        test_suite2,
-        test_suite3,
-        test_suite4,
-        test_suite5,
-        test_suite6,
-        test_suite7,
-        test_suite8,
-        test_suite9,
-        test_suite10, 
-        test_suite11,
-        test_suite12,
-        test_suite7_modified,
+        # test_suite1,
+        # test_suite2,
+        # test_suite3,
+        # test_suite4,
+        # test_suite5,
+        # test_suite6,
+        # test_suite7,
+        # test_suite8,
+        # test_suite9,
+        # test_suite10, 
+        # test_suite11,
+        # test_suite12,
+        # test_suite7_modified,
         # simple_custom_test,
         # simple_substraction,
-        simple_substraction_2,
-        simple_substraction_3,
-        simple_substraction_4,
-        simple_substraction_5,
-        test_multi_secret_1,
+        # simple_substraction_2,
+        # simple_substraction_3,
+        # simple_substraction_4,
+        # simple_substraction_5,
+        # test_multi_secret_1,
         # test_eval_3
+        #test_lots_of_parties,
+        #test_lots_of_parties_multiplication,
+        test_lots_of_parties_multiplication_2
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 
