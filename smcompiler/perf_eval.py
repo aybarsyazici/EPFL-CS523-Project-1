@@ -36,8 +36,9 @@ def run_processes(server_args, *client_args):
 
     server = Process(target=smc_server, args=(server_args,))
     clients = [Process(target=smc_client, args=(*args, queue)) for args in client_args]
-    total_bytes_sent = 0
-    total_bytes_received = 0
+    bytes_sent = []
+    bytes_received = []
+    computation_time = []
 
     server.start()
     time.sleep(3)
@@ -49,10 +50,11 @@ def run_processes(server_args, *client_args):
         client.join()
 
     for client in clients:
-        result, bytes_sent, bytes_received = queue.get()
+        result, b_out, b_in, t_comp = queue.get()
         results.append(result)
-        total_bytes_sent += bytes_sent
-        total_bytes_received += bytes_received
+        bytes_sent.append(b_out)
+        bytes_received.append(b_in)
+        computation_time.append(t_comp)
 
 
     server.terminate()
@@ -62,9 +64,7 @@ def run_processes(server_args, *client_args):
     time.sleep(2)
 
     print("Server stopped.")
-    print("Total bytes sent:", total_bytes_sent)
-    print("Total bytes received:", total_bytes_received)
-    return results
+    return results, bytes_sent, bytes_received, computation_time
 
 
 def suite(parties, expr, expected):
@@ -72,11 +72,15 @@ def suite(parties, expr, expected):
     prot = ProtocolSpec(expr=expr, participant_ids=participants)
     clients = [(name, prot, value_dict) for name, value_dict in parties.items()]
 
-    results = run_processes(participants, *clients)
+    results, bytes_sent, bytes_received, computation_time = run_processes(participants, *clients)
 
-    for result in results:
-        print(f"Result: {result} (expected: {expected})")
-        assert result == expected
+    for i in range(len(results)):
+        print(f"Result: {results[i]} (expected: {expected})")
+        print(f"Computation Time: {computation_time[i]}")
+        print(f"Bytes Sent: {bytes_sent[i]}")
+        print(f"Bytes Received: {bytes_received[i]}")
+
+        assert results[i] == expected
 
 
 def test_suite1():

@@ -36,7 +36,7 @@ from secret_sharing import(
     publish_triplet,
     get_all_triplets,
 )
-
+import time
 # Feel free to add as many imports as you want.
 
 
@@ -69,6 +69,7 @@ class SMCParty:
         self.tripletIndex = 0
         self.bytes_sent = 0
         self.bytes_received = 0
+        self.elapsed_time = 0
 
 
 
@@ -78,6 +79,7 @@ class SMCParty:
         # join ttp
         # publish i joined msg
         # check for other participants
+        start = time.time()
         print('Expression',self.protocol_spec.expr)
         for secret in self.value_dict:
             # create shares of the secret
@@ -97,8 +99,10 @@ class SMCParty:
         all_result_shares, byte_count = receive_public_results(self.comm,self.protocol_spec.participant_ids)
         self.bytes_received += byte_count
         print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
-        # Reconstruct & return.
-        return (reconstruct_shares(all_result_shares), self.bytes_sent, self.bytes_received)
+        reconstructed = reconstruct_shares(all_result_shares)
+        self.elapsed_time = time.time() - start
+        # Return the reconstructed results with the calculated metrics
+        return (reconstructed, self.bytes_sent, self.bytes_received, self.elapsed_time)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
