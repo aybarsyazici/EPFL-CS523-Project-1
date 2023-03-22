@@ -132,11 +132,14 @@ def reconstruct_shares(shares: List[Share]) -> int:
     print("TO RECONSTRUCT: ", shares)
     return sum([s.value for s in shares]) % default_q
 
+#sends serialized message and returns the length of the serialized message
 def send_share(share: Share, receiver_id: str, secret_id: int, comm: Communication) -> None:
     secret_id_int = int.from_bytes(secret_id, byteorder="big")
     label = f"{secret_id_int}"
     print(f"SMCParty: Sending secret share {label}: {comm.client_id} -> {receiver_id}")
-    comm.send_private_message(receiver_id, label, share.serialize_bytes())
+    serialized = share.serialize_bytes()
+    comm.send_private_message(receiver_id, label, serialized)
+    return len(serialized)
 
 def retrieve_share(id: int, comm: Communication) -> Share:
     """Retrieve a share from the server."""
@@ -151,16 +154,20 @@ def publish_result(share: Share, comm: Communication):
     """Publicly announce the final result"""
     label = f"{comm.client_id}"
     print(f"SMCParty: Broadcasting result share {label}: {comm.client_id} ->")
-    comm.publish_message(label, Share.serialize_bytes(share))
+    serialized = Share.serialize_bytes(share)
+    comm.publish_message(label, serialized)
+    return len(serialized)
 
 def receive_public_results(comm: Communication, participant_ids: list):
     public_shares = []
+    total_bytes = 0
     for participant in participant_ids:
         label = f"{participant}"
         print(f"SMCParty: Receiving result share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(participant, label)
+        total_bytes += len(payload)
         public_shares.append(Share.deserialize_bytes(payload))
-    return public_shares
+    return public_shares, total_bytes
 
 def get_beaver_triplet(comm: Communication, secret_id: int):
     """Get a beaver triplet from the server."""
@@ -172,12 +179,15 @@ def publish_triplet(share: Share, comm: Communication, d_or_e: str, secret_id: i
     """Publish computed triplet share"""
     label = f"{comm.client_id}-{d_or_e}-{str(secret_id)}"
     print(f"SMCParty: Broadcasting triplet share {label}: {comm.client_id} -> {share}")
-    comm.publish_message(label, Share.serialize_bytes(share))
+    serialized = Share.serialize_bytes(share)
+    comm.publish_message(label, serialized)
+    return len(serialized)
 
 def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int) -> tuple(int,int):
     # First get all d values
     d = None
     e = None
+    total_bytes = 0
     for participant in participant_ids:
         label = f"{participant}-d-{str(secret_id)}"
         print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
@@ -190,6 +200,7 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
         label = f"{participant}-e-{secret_id}" 
         print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(sender_id=participant, label=label)
+        total_bytes += len(payload)
         if e is None:
             e = Share.deserialize_bytes(payload).value 
         else:
@@ -197,7 +208,7 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
         d = d % default_q
         e = e % default_q
     print(f"SMCParty: Finished getting triplet shares: -> {comm.client_id} d: {d} e: {e}")
-    return d, e
+    return d, e, total_bytes
 
 
 

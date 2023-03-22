@@ -67,6 +67,9 @@ class SMCParty:
         self.protocol_spec = protocol_spec
         self.value_dict = value_dict
         self.tripletIndex = 0
+        self.bytes_sent = 0
+        self.bytes_received = 0
+
 
 
     def run(self) -> int:
@@ -82,18 +85,20 @@ class SMCParty:
             print(f"SMCParty: {self.client_id} has created shares for secret {secret.id} -> {shares}")
             for participant, share in zip(self.protocol_spec.participant_ids, shares):
                 # send share to participant using self.comm.send_private_message
-                send_share(share, participant, secret.id, self.comm)
+                #then, add the amount of bytes sent for evaluation part
+                self.bytes_sent += send_share(share, participant, secret.id, self.comm)
         # Process the expression
         result_share = self.process_expression(self.protocol_spec.expr)
         assert isinstance(result_share, Share)
         print(f"SMCParty: {self.client_id} has found the result share!")
         # Publish the result share.
-        publish_result(result_share, self.comm)
+        self.bytes_sent += publish_result(result_share, self.comm)
         # Retrieve the other resulting shares.
-        all_result_shares = receive_public_results(self.comm,self.protocol_spec.participant_ids)
+        all_result_shares, byte_count = receive_public_results(self.comm,self.protocol_spec.participant_ids)
+        self.bytes_received += byte_count
         print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
         # Reconstruct & return.
-        return reconstruct_shares(all_result_shares)
+        return (reconstruct_shares(all_result_shares), self.bytes_sent, self.bytes_received)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -138,10 +143,11 @@ class SMCParty:
                 # Each party locally computes a share of e = v - b
                 e_share = Share(index=r_expression.index, value=((r_expression.value - l_expression.beaver_triplets[1].value)%520633))
                 # broadcast d and e to all parties
-                publish_triplet(d_share, self.comm, "d", self.tripletIndex)
-                publish_triplet(e_share, self.comm, "e", self.tripletIndex)
+                self.bytes_sent += publish_triplet(d_share, self.comm, "d", self.tripletIndex)
+                self.bytes_sent += publish_triplet(e_share, self.comm, "e", self.tripletIndex)
                 # Get all the d and e values
-                (d,e) = get_all_triplets(comm=self.comm, participant_ids=self.protocol_spec.participant_ids, secret_id=self.tripletIndex)
+                (d,e,byte_count) = get_all_triplets(comm=self.comm, participant_ids=self.protocol_spec.participant_ids, secret_id=self.tripletIndex)
+                self.bytes_received += byte_count
                 l_expression.d = d
                 l_expression.e = e
                 self.tripletIndex += 1
