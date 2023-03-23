@@ -62,7 +62,7 @@ class SMCParty:
             value_dict: Dict[Secret, int]
         ):
         self.comm = Communication(server_host, server_port, client_id)
-
+        self.beaver_triplets = None
         self.client_id = client_id
         self.protocol_spec = protocol_spec
         self.value_dict = value_dict
@@ -141,7 +141,9 @@ class SMCParty:
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:
-                l_expression.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=self.tripletIndex)
+                if self.beaver_triplets is None:
+                    self.beaver_triplets = get_beaver_triplet(comm=self.comm, secret_id=self.tripletIndex)
+                l_expression.beaver_triplets = self.beaver_triplets
                 # Each party locally computes a share of d = s - a
                 d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)%520633))
                 # Each party locally computes a share of e = v - b
