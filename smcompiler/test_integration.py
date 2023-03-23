@@ -6,6 +6,7 @@ ALL EXISTING TESTS IN THIS SUITE SHOULD PASS WITHOUT ANY MODIFICATION TO THEM.
 """
 
 from functools import reduce
+import random
 import time
 from multiprocessing import Process, Queue
 import pytest
@@ -586,14 +587,36 @@ def test_lots_of_parties_multiplication_2():
 
     parties = {}
     secrets = []
-    for i in range(1,26):
-        secret = Secret()
-        parties[chr(ord('a') + i)] = {secret: i}
-        secrets.append(secret)
-    
+    for i in range(0,10):
+        parties[str(i)] = {}
+        for j in range(1,10):
+            secret = Secret()
+            secrets.append(secret)
+            parties[str(i)][secret] = j
+
     expr = reduce(lambda x, y: x * y, secrets)
-    expected = reduce(lambda x, y: (x * y)%default_q, range(1,26))
-    suite(parties, expr, expected)
+    expected = (
+        reduce(lambda x, y: x * y, range(1,10)) ** 10
+    )
+    print('EXPECTED', expected)
+    suite(parties, expr, expected % default_q),
+
+def test_small_parties_lots_of_multiplication():
+    parties = {}
+    secrets = []
+    for i in range(0,3):
+        parties[str(i)] = {}
+        for j in range(1,70):
+            secret = Secret()
+            secrets.append(secret)
+            parties[str(i)][secret] = j
+
+    expr = reduce(lambda x, y: x * y, secrets)
+    expected = (
+        reduce(lambda x, y: x * y, range(1,70)) ** 3
+    )
+    suite(parties, expr, expected % default_q)
+
 
 tests = [
         # test_suite1,
@@ -617,9 +640,10 @@ tests = [
         # simple_substraction_5,
         # test_multi_secret_1,
         # test_eval_3
-        #test_lots_of_parties,
-        #test_lots_of_parties_multiplication,
-        test_lots_of_parties_multiplication_2
+        test_lots_of_parties,
+        test_lots_of_parties_multiplication,
+        test_lots_of_parties_multiplication_2,
+        test_small_parties_lots_of_multiplication
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 

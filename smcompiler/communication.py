@@ -85,7 +85,7 @@ class Communication:
         # We can either use a websocket, or do some polling, but websockets would require asyncio.
         # So we are doing polling to avoid introducing a new programming paradigm.
         while True:
-            #print(f"GET  {url}")
+            print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
                 return res.content
@@ -105,7 +105,7 @@ class Communication:
         label_san = sanitize_url_param(label)
 
         url = f"{self.base_url}/public/{client_id_san}/{label_san}"
-        #print(f"POST {url}")
+        print(f"POST {url}")
         requests.post(url, message)
 
 
@@ -127,7 +127,7 @@ class Communication:
         # We can either use a websocket, or do some polling, but websockets would require asyncio.
         # So we are doing polling to avoid introducing a new programming paradigm.
         while True:
-            #print(f"GET  {url}")
+            print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
                 return res.content
@@ -146,7 +146,7 @@ class Communication:
         op_id_san = sanitize_url_param(op_id)
 
         url = f"{self.base_url}/shares/{client_id_san}/{op_id_san}"
-        #print(f"GET  {url}")
+        print(f"GET  {url}")
 
         res = requests.get(url)
         return tuple([Share.deserialize(s) for s in json.loads(res.text)]) # type: ignore

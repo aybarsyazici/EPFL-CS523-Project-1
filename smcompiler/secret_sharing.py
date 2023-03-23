@@ -191,16 +191,17 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
     e = None
     total_bytes = 0
     for participant in participant_ids:
+        print(f"SMCParty: {comm.client_id}: Trying to receive d/e index: {str(secret_id)} from {participant}")
         label = f"{participant}-d-{str(secret_id)}"
-        print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
+        #print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(sender_id=participant, label=label)
-        print(f"SMCParty: Received triplet share {label}: -> {comm.client_id}")
+        #print(f"SMCParty: Received triplet share {label}: -> {comm.client_id}")
         if d is None:
             d = Share.deserialize_bytes(payload).value
         else:
             d += Share.deserialize_bytes(payload).value
         label = f"{participant}-e-{secret_id}" 
-        print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
+        #print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(sender_id=participant, label=label)
         total_bytes += len(payload)
         if e is None:
@@ -209,7 +210,7 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
             e += Share.deserialize_bytes(payload).value
         d = d % default_q
         e = e % default_q
-    print(f"SMCParty: Finished getting triplet shares: -> {comm.client_id} d: {d} e: {e}")
+    print(f"SMCParty: {comm.client_id} Finished getting d/e index: {str(secret_id)}")
     return d, e, total_bytes
 
 # For use case
