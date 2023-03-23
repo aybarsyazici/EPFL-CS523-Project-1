@@ -195,14 +195,14 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
         label = f"{participant}-d-{str(secret_id)}"
         #print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(sender_id=participant, label=label)
-        #print(f"SMCParty: Received triplet share {label}: -> {comm.client_id}")
+        print(f"SMCParty: {comm.client_id}: Received d{str(secret_id)} from {participant}: -> {Share.deserialize_bytes(payload)}")
         if d is None:
             d = Share.deserialize_bytes(payload).value
         else:
             d += Share.deserialize_bytes(payload).value
         label = f"{participant}-e-{secret_id}" 
-        #print(f"SMCParty: Receiving triplet share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(sender_id=participant, label=label)
+        print(f"SMCParty: {comm.client_id}: Received e{str(secret_id)} from {participant}: -> {Share.deserialize_bytes(payload)}")
         total_bytes += len(payload)
         if e is None:
             e = Share.deserialize_bytes(payload).value 
@@ -214,17 +214,17 @@ def get_all_triplets(comm: Communication, participant_ids: list, secret_id: int)
     return d, e, total_bytes
 
 # For use case
-def publish_result_for_class(share: Share, comm: Communication, lecture: str):
+def publish_result_for_class(share: Share, comm: Communication, lecture: str, type: str):
     """Publicly announce the final result"""
-    label = f"{comm.client_id}|{lecture}"
+    label = f"{comm.client_id}|{lecture}|{type}"
     print(f"SMCParty: Broadcasting result share {label}: {comm.client_id} ->")
     serialized = Share.serialize_bytes(share)
     comm.publish_message(label, serialized)
 
-def receive_public_results_for_class(comm: Communication, participant_ids: list, lecture: str):
+def receive_public_results_for_class(comm: Communication, participant_ids: list, lecture: str, type: str):
     public_shares = []
     for participant in participant_ids:
-        label = f"{participant}|{lecture}"
+        label = f"{participant}|{lecture}|{type}"
         print(f"SMCParty: Receiving result share {label}: -> {comm.client_id}")
         payload = comm.retrieve_public_message(participant, label)
         public_shares.append(Share.deserialize_bytes(payload))

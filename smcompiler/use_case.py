@@ -44,6 +44,7 @@ class Student():
         self.value_dict = value_dict
         self.shares = {}
         self.means = {}
+        self.beaver_triplets = None
         self.standard_deviations = {}
         self.tripletIndex = 0
 
@@ -83,10 +84,10 @@ class Student():
             for share in shares:
                 sum += share
             # Publish the result
-            publish_result_for_class(sum, self.comm, lecture)
+            publish_result_for_class(sum, self.comm, lecture, 'mean')
         # Get all the results
         for lecture in self.cl.lectures:
-            public_shares = receive_public_results_for_class(self.comm, self.cl.students, lecture)
+            public_shares = receive_public_results_for_class(self.comm, self.cl.students, lecture, 'mean')
             # Reconstruct the result
             result = reconstruct_shares(public_shares)
             # Store the result
@@ -112,10 +113,10 @@ class Student():
                 sum += self.handle_mult((student_count*share - self.means[lecture]),(student_count*share - self.means[lecture]))
             # Publish the result
             print(f'Class: {self.client_id} has computed the SUM VAR     of lecture {lecture} -> {sum}')
-            publish_result_for_class(sum, self.comm, lecture)
+            publish_result_for_class(sum, self.comm, lecture, 'variance')
         # Get all the results
         for lecture in self.cl.lectures:
-            public_shares = receive_public_results_for_class(self.comm, self.cl.students, lecture)
+            public_shares = receive_public_results_for_class(self.comm, self.cl.students, lecture, 'variance')
             # Reconstruct the result
             result = reconstruct_shares(public_shares)
             # Store the result
@@ -139,12 +140,16 @@ class Student():
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:
-                l_expression.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=self.tripletIndex)
+                if self.beaver_triplets is None:
+                    self.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=0)
+                    print(f'Class: {self.client_id} has beaver triplets: {self.beaver_triplets}')
+                l_expression.beaver_triplets = self.beaver_triplets
                 # Each party locally computes a share of d = s - a
                 d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)))
                 # Each party locally computes a share of e = v - b
                 e_share = Share(index=r_expression.index, value=((r_expression.value - l_expression.beaver_triplets[1].value)))
                 # broadcast d and e to all parties
+                print(f'Class: {self.client_id} publishing d/e {d_share},{e_share}')
                 publish_triplet(d_share, self.comm, "d", self.tripletIndex)
                 publish_triplet(e_share, self.comm, "e", self.tripletIndex)
                 # Get all the d and e values
