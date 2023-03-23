@@ -225,7 +225,7 @@ def pc_test5():
 
 
 
-tests_party_count = [pc_test1, pc_test2, pc_test3, pc_test4, pc_test5]#, pc_test2, pc_test3]
+tests_party_count = [pc_test1, pc_test2, pc_test3, pc_test4, pc_test5]
 tests = [test_suite1]
 
 if __name__ == "__main__":
