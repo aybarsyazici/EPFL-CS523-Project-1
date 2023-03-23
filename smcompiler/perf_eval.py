@@ -166,15 +166,66 @@ def pc_test3():
 
 
 def pc_test4():
-    pass
+    p1_secrets = [Secret(), Secret()]
+    p2_secrets = [Secret(), Secret()]
+    p3_secrets = [Secret(), Secret()]   
+    p4_secrets = [Secret(), Secret()]
+    p5_secrets = [Secret(), Secret()]   
+    p6_secrets = [Secret(), Secret()]
+
+    parties = {
+        "p1": {p1_secrets[0]: 13, p1_secrets[1]: 17},
+        "p2": { p2_secrets[0]: 8, p2_secrets[1]: 12},
+        "p3": { p3_secrets[0]: 10, p3_secrets[1]: 9},
+        "p4": { p4_secrets[0]: 16, p4_secrets[1]: 2},
+        "p5": { p5_secrets[0]: 20, p5_secrets[1]: 11},
+        "p6": { p6_secrets[0]: 14, p6_secrets[1]: 9}
+    }
+
+    expr = (p1_secrets[0] + Scalar(5)) * (Scalar(8) - p2_secrets[0]) + (p3_secrets[0] * Scalar(2)) - (p4_secrets[0] - p5_secrets[0]) * p6_secrets[0] - p1_secrets[1] + (Scalar(11) * Scalar(6)) + (Scalar(99) - Scalar(6)*p2_secrets[1]) - p3_secrets[1] + p4_secrets[1] * (p5_secrets[1] - p6_secrets[1])
+    expected = (13 + 5) * (8 - 8) + (10 * 2) - (16 - 20) * 14 - 17 + (11 * 6) + (99 - 6*12) - 9 + 2 * (11 - 9)
+
+    suite(parties, expr, expected)
 
 def pc_test5():
-    pass
+    p1_secret = Secret()
+    p2_secret = Secret()
+    p3_secret = Secret()
+    p4_secret = Secret()
+    p5_secret = Secret()
+    p6_secret = Secret()
+    p7_secret = Secret()
+    p8_secret = Secret()
+    p9_secret = Secret()
+    p10_secret = Secret()
+    p11_secret = Secret()
+    p12_secret = Secret()
+
+    parties = {
+        "p1": {p1_secret: 13},
+        "p2": { p2_secret: 8},
+        "p3": { p3_secret: 10},
+        "p4": { p4_secret: 16},
+        "p5": { p5_secret: 20},
+        "p6": { p6_secret: 14},
+        "p7": {p7_secret: 17},
+        "p8": { p8_secret: 12},
+        "p9": { p9_secret: 9},
+        "p10": { p10_secret: 2},
+        "p11": { p11_secret: 11},
+        "p12": { p12_secret: 9}
+    }
+
+    expr = (p1_secret + Scalar(5)) * (Scalar(8) - p2_secret) + (p3_secret * Scalar(2)) - (p4_secret - p5_secret) * p6_secret - p7_secret + (Scalar(11) * Scalar(6)) + (Scalar(99) - Scalar(6)*p8_secret) - p9_secret + p10_secret * (p11_secret - p12_secret)
+    expected = (13 + 5) * (8 - 8) + (10 * 2) - (16 - 20) * 14 - 17 + (11 * 6) + (99 - 6*12) - 9 + 2 * (11 - 9)
+
+    suite(parties, expr, expected)
 
 
 
 
-tests_party_count = [pc_test1, pc_test2, pc_test3]#, pc_test2, pc_test3]
+
+tests_party_count = [pc_test1, pc_test2, pc_test3, pc_test4, pc_test5]#, pc_test2, pc_test3]
 tests = [test_suite1]
 
 if __name__ == "__main__":
