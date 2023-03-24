@@ -617,6 +617,37 @@ def test_small_parties_lots_of_multiplication():
     )
     suite(parties, expr, expected % default_q)
 
+def just_scalar():
+    parties = {}
+    scalars = []
+    for i in range(0,3):
+        parties[str(i)] = {}
+        for j in range(1,70):
+            scalars.append(Scalar(j))
+
+    expr = reduce(lambda x, y: x * y, scalars)
+    expected = (
+        reduce(lambda x, y: x * y, range(1,70)) ** 3
+    )
+    suite(parties, expr, expected % default_q)
+
+def just_one_party_secret():
+    parties = {}
+    scalars = []
+    for i in range(0,3):
+        parties[str(i)] = {}
+        if i == 0:
+            parties[str(i)] = {Secret(): 5}
+        for j in range(1,70):
+            scalars.append(Scalar(j))
+
+    expr = reduce(lambda x, y: x * y, scalars)
+    expr = expr * list(parties['0'].keys())[0]
+    expected = (
+        reduce(lambda x, y: x * y, range(1,70)) ** 3
+    )
+    expected = expected * 5
+    suite(parties, expr, expected % default_q)
 
 tests = [
         test_suite1,
@@ -643,7 +674,9 @@ tests = [
         test_lots_of_parties,
         test_lots_of_parties_multiplication,
         test_lots_of_parties_multiplication_2,
-        test_small_parties_lots_of_multiplication
+        test_small_parties_lots_of_multiplication,
+        just_scalar,
+        just_one_party_secret,
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]
 

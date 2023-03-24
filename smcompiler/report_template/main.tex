@@ -71,7 +71,7 @@ After this process each client processes the expression tree. The tree is then r
 The client processes the tree by first processing the left child. Then it processes the right child. After processing the children, 
 the client processes the current node. The processing of the node depends on the type of the node. If the node is a leaf, then it could either be 
 a Secret or a Scalar. If the node is a Secret, then the client gets the his share of this secret from the server and returns, transforming the Secret Node into a Share Node.
-If the node is a Scalar, then the client returns the scalar value. If the node is an operation, the client returns left\_child \textit{operation} right\_child.
+If the node is a Scalar, then the client returns the scalar(int) value. If the node is an operation, the client returns left\_child \textit{operation} right\_child.
 If both children of an operation is a int(Scalar) then the operation is already defined in python. But to be able to do the computations, 
 if any of the children is a Share, the operations and their reverse versions are overloaded in the Share class.
 \\ 
