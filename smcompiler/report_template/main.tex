@@ -34,6 +34,7 @@ The final part of  the paper \ref{use_case} covers a possible use case of this f
 and the unit tests that we have performed to ensure the correctness of our implementation.
 
 \section{Threat model}
+\label{threat_model}
 The critical part that should be clarified first about this implementation is the assumption. The framework assumes 
 honest but curious clients, as any deviation from the given algorithm would break the framework. On top of this all parties are 
 required to cooperate to be able to retrieve the final results. I.e. if there are N parties, there will be N shares computed, 
@@ -82,6 +83,7 @@ Each evaluation of an operation node returns either a Share or an int. The opera
 The tree is processed this way from the leafs to the root. The root of the tree is the final result of the expression, which will be a share(assuming there was at least one secret in the expression).
 \\
 The clients then after obtaining the final results, publishes it as a public message on the server. Then every client retrieves all the public results and reconstructs the final result.
+If the result obtained is of type int rather than share, then this means that there was no secret in the expression. In this case the client can directly return the result to the user.
 
 \section{Performance evaluation}
 \label{perf_eval}
@@ -89,8 +91,62 @@ Report the computation and communication cost of the framework for different cir
 
 \section{Application}
 \label{use_case}
-Detail the use case of SMC and a circuit for this use case. Discuss possible privacy leakage not
-covered by SMC. Discuss a mitigation if needed.
+\subsection{Introduction}
+For our use case, we imagine the following scenario. Where the clients of our SMC protocol will be the students of 'Evil School'. Where in this school, professors do not announce the
+statistics for the exams. Instead they just reveal to each student their grade. The students want to be able to know how well they have done in the exam compared to other students, and thus want to learn
+the mean and standard deviation of the grades. And as the professors don't reveal these, the students want to calculate themselves, but they do not wish the reveal their grades to each other. So they will be using the SMC framework.
+\\
+\subsection{Adversarial Model}
+The Adversarial model is as extremely similar to the one in section \ref{threat_model}.
+The students are honest but curious. They want to learn the statistics of the grades, 
+but they do not want to reveal their grades to each other. As reconstruction of the secrets require all the shares yet again,
+if there is any malicious student in the group, then the protocol will fail.
+\\
+Yet again sending messages/values to each other is done through a server. And Trusted Third Party is used for beaver triplet generation.
 
+\subsection{Averaging}
+The structure of the use case is as follows: N students have their grades for L amount of classes. Thus in the end each student should obtain L averages and L standard deviations.
+Firstly each student will generate N many shares for each of their grade and send one to each other. Thus each student will have L shares from each other, which means N*L shares in total. 
+They'll use these shares first to calculate the average for each course. 
+\begin{math}
+{avg_L} = \sum_{i=1}^{N}x_i
+\end{math}
+where avg\_L is the mean for course L and x\_i is the share of the i'th student for the course. Then they'll use these averages to calculate the standard deviation for each course.
+Note that, to avoid dealing with floating point numbers, we delay the divisions by N until the end of the computation.
+\subsection{Standard deviation}
+Normally standard deviation is calculated as follows:
+\begin{math}
+\sigma = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(x_i - \mu)^2}
+\end{math}
+But again to not deal with floating point numbers with shares, we'll reserve the square root and division to the last part.
+So we need to first calculate
+\begin{math}
+    \sum_{i=1}^{N}(x_i - \mu)^2
+\end{math}
+But because we have not divided the sum by N, we don't currently have \begin{math}
+    \mu
+\end{math} but rather we have
+\begin{math}
+    N\mu
+\end{math}
+So with some quick algebra we get the following:
+\begin{math}
+    % Write (N^2 * \sum_{i=1}^{N}(x_i - \mu)^2) / N^2
+    \frac{N^2\sum_{i=1}^{N}(x_i - \mu)^2}{N^2} = \frac{\sum_{i=1}^{N}(N(x_i - \mu))^2}{N^2}
+\end{math}
+We again delay the division to the end, so we what each client will calculate is actually:
+\begin{math}
+    \sum_{i=1}^{N}(N(x_i - \mu))^2
+\end{math}
+Remember that in the previous step they had already calculated \begin{math}
+    N\mu
+\end{math} 
+So for each course they'll multiply each share by N substract from mean and square it. They'll sum each of these squares, publish their result then reconstruct the final result.
+But remember that we have not done any division yet, So before returning the average we divide the \begin{math} N\mu \end{math} for each course by N, and before returning the standard deviation we divide by \begin{math}
+    N^3
+\end{math} and take the square root.
+\subsection{Testing}
+The proposed system is implemented in use\_case.py and tested in test\_use\_case.py and holds the desired functionality. In test cases we used numpy to calculate the expected averages and standard deviations, 
+and used isclose to check if the results are close enough(within 0.001 margin) to the expected results.
 \bibliographystyle{IEEEtran}
 \end{document}
