@@ -641,8 +641,8 @@ tests = [
         test_multi_secret_1,
         test_eval_3,
         test_lots_of_parties,
-        # test_lots_of_parties_multiplication,
-        # test_lots_of_parties_multiplication_2,
+        test_lots_of_parties_multiplication,
+        test_lots_of_parties_multiplication_2,
         test_small_parties_lots_of_multiplication
         # test_multi_secret_2, This fails saying: Expected -28117 but got 492516. Notice that the expected value is negative. But we operate in Zq(Which is 520633), so -28117mod(520633) = 492516. So the test is correct.
 ]

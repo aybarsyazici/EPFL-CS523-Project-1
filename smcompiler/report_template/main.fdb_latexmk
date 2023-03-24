@@ -1,14 +1,6 @@
 # Fdb version 4
-["bibtex main"] 1679566143 "main.aux" "main.bbl" "main" 1679566180 0
-  "./bib.bib" 1677831955 282 78140c853b0400494b63e903a19f331c ""
-  "/usr/local/texlive/2023/texmf-dist/bibtex/bst/ieeetran/IEEEtran.bst" 1440712899 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
-  "main.aux" 1679566179 1289 13d859b08e2f26bf7c8f8998a2110b35 "pdflatex"
-  (generated)
-  "main.bbl"
-  "main.blg"
-  (rewritten before read)
-["pdflatex"] 1679566179 "/Users/aybarsyazici/Documents/EPFL/PETs/CS-523-public/smcompiler/report_template/main.tex" "main.pdf" "main" 1679566180 0
-  "/Users/aybarsyazici/Documents/EPFL/PETs/CS-523-public/smcompiler/report_template/main.tex" 1679566179 1276 d68d9cd950c5f39cb5cc3dc2dfb1efa3 ""
+["pdflatex"] 1679657643 "/Users/aybarsyazici/Documents/EPFL/PETs/CS-523-public/smcompiler/report_template/main.tex" "main.pdf" "main" 1679657643 0
+  "/Users/aybarsyazici/Documents/EPFL/PETs/CS-523-public/smcompiler/report_template/main.tex" 1679657642 6899 4b16e834aef7a638a14a3f520bec2acf ""
   "/usr/local/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2023/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -58,7 +50,6 @@
   "/usr/local/texlive/2023/texmf-dist/tex/latex/blindtext/blindtext.sty" 1325892463 47295 de48b7f8ebf4b54709a2f6b2c7106dd5 ""
   "/usr/local/texlive/2023/texmf-dist/tex/latex/caption/caption.sty" 1678653221 55778 14d5c99aa26410e440820bb9ea5b8b3a ""
   "/usr/local/texlive/2023/texmf-dist/tex/latex/caption/caption3.sty" 1678653221 71836 1a735454ad10692452eb2f2fc37f3865 ""
-  "/usr/local/texlive/2023/texmf-dist/tex/latex/cite/cite.sty" 1425427964 26218 19edeff8cdc2bcb704e8051dc55eb5a7 ""
   "/usr/local/texlive/2023/texmf-dist/tex/latex/comment/comment.sty" 1472166125 10197 204f75d5d8d88aa345a8c402e879e63b ""
   "/usr/local/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty" 1579991033 13886 d1306dcf79a944f6988e688c1785f9ce ""
   "/usr/local/texlive/2023/texmf-dist/tex/latex/graphics-cfg/color.cfg" 1459978653 1213 620bba36b25224fa9b7e1ccb4ecb76fd ""
@@ -94,10 +85,9 @@
   "/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1679566116 4623355 b8cad38412faebe1ce5b780a45db67bd ""
   "/usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1679566089 7883459 cff71eaee0f00f4e5c1365342eb280cb ""
   "/usr/local/texlive/2023/texmf.cnf" 1678822455 577 1b2b1af17af2508fb20dd85783af4050 ""
-  "main.aux" 1679566179 1289 13d859b08e2f26bf7c8f8998a2110b35 "pdflatex"
-  "main.bbl" 1679566143 1092 e741f0e535649a28f217a73d96ee88ea "bibtex main"
-  "main.out" 1679566179 713 6600ace8174c69dd69dcd670b7a0aaff "pdflatex"
-  "main.tex" 1679566179 1276 d68d9cd950c5f39cb5cc3dc2dfb1efa3 ""
+  "main.aux" 1679657643 1810 77e666003e545c5dcf7865cebd66f391 "pdflatex"
+  "main.out" 1679657643 1033 b83c9032c91540a5d78f3d35ceedbd7f "pdflatex"
+  "main.tex" 1679657642 6899 4b16e834aef7a638a14a3f520bec2acf ""
   (generated)
   "main.aux"
   "main.log"

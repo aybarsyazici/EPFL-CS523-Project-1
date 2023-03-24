@@ -44,7 +44,6 @@ class Student():
         self.value_dict = value_dict
         self.shares = {}
         self.means = {}
-        self.beaver_triplets = None
         self.standard_deviations = {}
         self.tripletIndex = 0
 
@@ -140,10 +139,7 @@ class Student():
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:
-                if self.beaver_triplets is None:
-                    self.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=0)
-                    print(f'Class: {self.client_id} has beaver triplets: {self.beaver_triplets}')
-                l_expression.beaver_triplets = self.beaver_triplets
+                l_expression.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=self.tripletIndex)
                 # Each party locally computes a share of d = s - a
                 d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)))
                 # Each party locally computes a share of e = v - b
