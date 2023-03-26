@@ -1,12 +1,12 @@
 Run 1: 
-	Bytes sent: 1388.16
-	Bytes received: 2670.72
-	Runtime: 1.0453752613067626
+	Bytes sent: 1388.36
+	Bytes received: 2669.0
+	Runtime: 1.0428457832336426
 Run 2: 
 	Bytes sent: 1387.68
-	Bytes received: 2671.2
-	Runtime: 1.0952299594879151
+	Bytes received: 2666.4
+	Runtime: 0.9484306335449219
 On average: 
-	Bytes sent => Mean: 1387.92, Std Dev: 0.2400000000000091 
-	Bytes received => Mean: 2670.96, Std Dev: 0.2400000000000091 
-	Runtime => Mean: 1.0703026103973388, Std Dev: 0.024927349090576256
+	Bytes sent => Mean: 1388.02, Std Dev: 0.33999999999991815 
+	Bytes received => Mean: 2667.7, Std Dev: 1.2999999999999545 
+	Runtime => Mean: 0.9956382083892823, Std Dev: 0.04720757484436039

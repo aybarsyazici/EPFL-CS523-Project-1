@@ -6,7 +6,7 @@ You should not need to change this file.
 import json
 import time
 from typing import Union, Tuple
-
+import sys
 import requests
 
 from secret_sharing import Share
@@ -49,6 +49,8 @@ class Communication:
         self.base_url = f"{protocol}://{server_host}:{server_port}"
         self.client_id = client_id
         self.poll_delay = poll_delay
+        self.bytes_sent = 0
+        self.bytes_received = 0
 
 
     def send_private_message(
@@ -64,6 +66,7 @@ class Communication:
         client_id_san = sanitize_url_param(self.client_id)
         receiver_id_san = sanitize_url_param(receiver_id)
         label_san = sanitize_url_param(label)
+        self.bytes_sent += sys.getsizeof(message)
 
         url = f"{self.base_url}/private/{client_id_san}/{receiver_id_san}/{label_san}"
         requests.post(url, message)
@@ -88,6 +91,7 @@ class Communication:
             print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
+                self.bytes_received += sys.getsizeof(res.content)
                 return res.content
             time.sleep(self.poll_delay)
 
@@ -103,7 +107,7 @@ class Communication:
 
         client_id_san = sanitize_url_param(self.client_id)
         label_san = sanitize_url_param(label)
-
+        self.bytes_sent += sys.getsizeof(message)
         url = f"{self.base_url}/public/{client_id_san}/{label_san}"
         print(f"POST {url}")
         requests.post(url, message)
@@ -130,6 +134,7 @@ class Communication:
             print(f"GET  {url}")
             res = requests.get(url)
             if res.status_code == 200:
+                self.bytes_received += sys.getsizeof(res.content)
                 return res.content
             time.sleep(self.poll_delay)
 
@@ -149,4 +154,11 @@ class Communication:
         print(f"GET  {url}")
 
         res = requests.get(url)
+        self.bytes_received += sys.getsizeof(res.content)
         return tuple([Share.deserialize(s) for s in json.loads(res.text)]) # type: ignore
+
+    def get_bytes_received(self):
+        return self.bytes_received
+
+    def get_bytes_sent(self):
+        return self.bytes_sent    

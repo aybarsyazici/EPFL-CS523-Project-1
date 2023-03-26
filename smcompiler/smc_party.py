@@ -102,7 +102,7 @@ class SMCParty:
         self.elapsed_time = time.time() - start
         #commented out for test purposes
         #return reconstructed
-        return (reconstructed, self.bytes_sent, self.bytes_received, self.elapsed_time)
+        return (reconstructed, self.comm.get_bytes_sent(), self.comm.get_bytes_received(), self.elapsed_time)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
