@@ -1,0 +1,12 @@
+Run 1: 
+	Bytes sent: 158.0
+	Bytes received: 211.0
+	Runtime: 0.02356743812561035
+Run 2: 
+	Bytes sent: 158.5
+	Bytes received: 211.0
+	Runtime: 0.3391294479370117
+On average: 
+	Bytes sent => Mean: 158.25, Std Dev: 0.25 
+	Bytes received => Mean: 211.0, Std Dev: 0.0 
+	Runtime => Mean: 0.18134844303131104, Std Dev: 0.15778100490570068

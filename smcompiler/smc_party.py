@@ -62,7 +62,6 @@ class SMCParty:
             value_dict: Dict[Secret, int]
         ):
         self.comm = Communication(server_host, server_port, client_id)
-        self.beaver_triplets = None
         self.client_id = client_id
         self.protocol_spec = protocol_spec
         self.value_dict = value_dict
@@ -101,8 +100,9 @@ class SMCParty:
         print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
         reconstructed = reconstruct_shares(all_result_shares)
         self.elapsed_time = time.time() - start
-        # Return the reconstructed results with the calculated metrics
-        return (reconstructed)
+        #commented out for test purposes
+        #return reconstructed
+        return (reconstructed, self.bytes_sent, self.bytes_received, self.elapsed_time)
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -126,7 +126,9 @@ class SMCParty:
     def handle_scalar(self, expression):
         return expression.value
     def handle_secret(self, expression):
-        return retrieve_share(expression.id, self.comm)
+        received_share, received_bytes = retrieve_share(expression.id, self.comm)
+        self.bytes_received += received_bytes
+        return received_share
     def handle_add(self, expression):
         leftSide = self.process_expression(expression.left)
         rightSide = self.process_expression(expression.right)
@@ -141,9 +143,7 @@ class SMCParty:
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:
-                if self.beaver_triplets is None:
-                    self.beaver_triplets = get_beaver_triplet(self.comm, self.tripletIndex)
-                l_expression.beaver_triplets = self.beaver_triplets
+                l_expression.beaver_triplets = get_beaver_triplet(self.comm, self.tripletIndex)
                 # Each party locally computes a share of d = s - a
                 d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)%520633))
                 # Each party locally computes a share of e = v - b
