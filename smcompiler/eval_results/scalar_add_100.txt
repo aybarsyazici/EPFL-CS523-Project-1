@@ -1,124 +1,124 @@
 Run 1: 
-	Bytes sent: 151.4
-	Bytes received: 263.0
-	Runtime: 0.31415162086486814
+	Bytes sent: 316.4
+	Bytes received: 527.6
+	Runtime: 0.21639318466186525
 Run 2: 
-	Bytes sent: 151.2
-	Bytes received: 265.0
-	Runtime: 0.23183107376098633
+	Bytes sent: 317.2
+	Bytes received: 528.4
+	Runtime: 0.32921013832092283
 Run 3: 
-	Bytes sent: 151.6
-	Bytes received: 265.0
-	Runtime: 0.3606735706329346
+	Bytes sent: 318.0
+	Bytes received: 530.0
+	Runtime: 0.300019359588623
 Run 4: 
-	Bytes sent: 151.8
-	Bytes received: 265.0
-	Runtime: 0.15808234214782715
+	Bytes sent: 316.6
+	Bytes received: 527.0
+	Runtime: 0.21539878845214844
 Run 5: 
-	Bytes sent: 152.4
-	Bytes received: 264.0
-	Runtime: 0.29042782783508303
+	Bytes sent: 317.0
+	Bytes received: 527.4
+	Runtime: 0.19965996742248535
 Run 6: 
-	Bytes sent: 152.4
-	Bytes received: 265.0
-	Runtime: 0.3351418495178223
+	Bytes sent: 317.0
+	Bytes received: 529.0
+	Runtime: 0.30515303611755373
 Run 7: 
-	Bytes sent: 150.6
-	Bytes received: 265.0
-	Runtime: 0.28313407897949217
+	Bytes sent: 317.8
+	Bytes received: 529.0
+	Runtime: 0.3134577751159668
 Run 8: 
-	Bytes sent: 152.2
-	Bytes received: 265.0
-	Runtime: 0.16615629196166992
+	Bytes sent: 316.8
+	Bytes received: 528.0
+	Runtime: 0.1580435276031494
 Run 9: 
-	Bytes sent: 152.2
-	Bytes received: 264.0
-	Runtime: 0.377665376663208
+	Bytes sent: 316.6
+	Bytes received: 526.2
+	Runtime: 0.276539945602417
 Run 10: 
-	Bytes sent: 151.4
-	Bytes received: 264.0
-	Runtime: 0.2470649242401123
+	Bytes sent: 316.4
+	Bytes received: 527.6
+	Runtime: 0.24142179489135743
 Run 11: 
-	Bytes sent: 152.2
-	Bytes received: 264.0
-	Runtime: 0.3469820022583008
+	Bytes sent: 316.6
+	Bytes received: 527.8
+	Runtime: 0.25372862815856934
 Run 12: 
-	Bytes sent: 152.0
-	Bytes received: 265.0
-	Runtime: 0.16041154861450196
+	Bytes sent: 316.0
+	Bytes received: 528.0
+	Runtime: 0.150462007522583
 Run 13: 
-	Bytes sent: 151.4
-	Bytes received: 265.0
-	Runtime: 0.3536400318145752
+	Bytes sent: 317.0
+	Bytes received: 529.0
+	Runtime: 0.24875917434692382
 Run 14: 
-	Bytes sent: 152.4
-	Bytes received: 265.0
-	Runtime: 0.3935115814208984
+	Bytes sent: 318.0
+	Bytes received: 530.0
+	Runtime: 0.2821621894836426
 Run 15: 
-	Bytes sent: 151.8
-	Bytes received: 263.0
-	Runtime: 0.270537281036377
+	Bytes sent: 317.0
+	Bytes received: 529.0
+	Runtime: 0.3266002178192139
 Run 16: 
-	Bytes sent: 152.0
-	Bytes received: 265.0
-	Runtime: 0.20161151885986328
+	Bytes sent: 315.8
+	Bytes received: 526.2
+	Runtime: 0.27533817291259766
 Run 17: 
-	Bytes sent: 152.0
-	Bytes received: 263.0
-	Runtime: 0.3427561283111572
+	Bytes sent: 317.2
+	Bytes received: 529.2
+	Runtime: 0.28033080101013186
 Run 18: 
-	Bytes sent: 152.4
-	Bytes received: 265.0
-	Runtime: 0.35011582374572753
+	Bytes sent: 317.2
+	Bytes received: 528.4
+	Runtime: 0.13329434394836426
 Run 19: 
-	Bytes sent: 151.8
-	Bytes received: 265.0
-	Runtime: 0.15361275672912597
+	Bytes sent: 317.0
+	Bytes received: 528.2
+	Runtime: 0.20457096099853517
 Run 20: 
-	Bytes sent: 151.4
-	Bytes received: 263.0
-	Runtime: 0.3126701354980469
+	Bytes sent: 316.2
+	Bytes received: 527.4
+	Runtime: 0.2712087631225586
 Run 21: 
-	Bytes sent: 151.2
-	Bytes received: 263.0
-	Runtime: 0.22989945411682128
+	Bytes sent: 316.0
+	Bytes received: 526.4
+	Runtime: 0.28815517425537107
 Run 22: 
-	Bytes sent: 151.8
-	Bytes received: 264.0
-	Runtime: 0.18354663848876954
+	Bytes sent: 317.6
+	Bytes received: 529.6
+	Runtime: 0.13025131225585937
 Run 23: 
-	Bytes sent: 152.0
-	Bytes received: 264.0
-	Runtime: 0.309293794631958
+	Bytes sent: 317.2
+	Bytes received: 529.2
+	Runtime: 0.1570497989654541
 Run 24: 
-	Bytes sent: 152.4
-	Bytes received: 265.0
-	Runtime: 0.19293723106384278
+	Bytes sent: 317.2
+	Bytes received: 529.2
+	Runtime: 0.09656805992126465
 Run 25: 
-	Bytes sent: 152.4
-	Bytes received: 264.0
-	Runtime: 0.18049297332763672
+	Bytes sent: 316.2
+	Bytes received: 527.4
+	Runtime: 0.22717466354370117
 Run 26: 
-	Bytes sent: 152.2
-	Bytes received: 264.0
-	Runtime: 0.326519250869751
+	Bytes sent: 317.0
+	Bytes received: 528.2
+	Runtime: 0.23610644340515136
 Run 27: 
-	Bytes sent: 151.6
-	Bytes received: 265.0
-	Runtime: 0.19266514778137206
+	Bytes sent: 316.8
+	Bytes received: 528.0
+	Runtime: 0.2876152038574219
 Run 28: 
-	Bytes sent: 151.0
-	Bytes received: 262.0
-	Runtime: 0.19974303245544434
+	Bytes sent: 316.6
+	Bytes received: 528.6
+	Runtime: 0.12789459228515626
 Run 29: 
-	Bytes sent: 152.4
-	Bytes received: 264.0
-	Runtime: 0.31528353691101074
+	Bytes sent: 316.6
+	Bytes received: 528.6
+	Runtime: 0.2005281925201416
 Run 30: 
-	Bytes sent: 152.0
-	Bytes received: 265.0
-	Runtime: 0.28521013259887695
+	Bytes sent: 316.2
+	Bytes received: 527.4
+	Runtime: 0.28588380813598635
 On average: 
-	Bytes sent => Mean: 151.85333333333335, Std Dev: 0.4759084879353278 
-	Bytes received => Mean: 264.26666666666665, Std Dev: 0.8537498983243799 
-	Runtime => Mean: 0.2688589652379354, Std Dev: 0.07410829856450758
+	Bytes sent => Mean: 316.84000000000003, Std Dev: 0.5595236068895283 
+	Bytes received => Mean: 528.2000000000002, Std Dev: 1.010610376620654 
+	Runtime => Mean: 0.2339660008748373, Std Dev: 0.06467829905750233

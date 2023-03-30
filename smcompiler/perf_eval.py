@@ -234,7 +234,7 @@ def party_count_test5_old():
 """
 
 def parties_test(party_count):
-    secrets_per_party = 1#int(50/party_count)
+    secrets_per_party = int(50/party_count)
 
     secrets = []
     for i in range(party_count):
@@ -257,6 +257,31 @@ def parties_test(party_count):
             expr += secrets[i][j]
  
     return suite(parties, expr, expected % default_q)
+
+def parties_test2(party_count):
+    secrets_per_party = 1
+
+    secrets = []
+    for i in range(party_count):
+        secrets.append([Secret() for _ in range(secrets_per_party)])
+
+    parties = {}
+    expected = 0
+    for i in range(party_count):
+        ps = "p" + str(i+1)
+        parties[ps] = {}
+        for j in range(secrets_per_party):
+            v = random.randint(1,10)
+            parties[ps][secrets[i][j]] = v
+            expected += v
+
+    expr = Scalar(0)
+
+    for i in range(party_count):
+        for j in range(secrets_per_party):
+            expr += secrets[i][j]
+ 
+    return suite(parties, expr, expected % default_q)    
 
 
 def secret_addition_test(s):
@@ -400,7 +425,7 @@ def test_cases_parties():
         computation_time = []
         filename = f'parties_{p}.txt'
         f = open(filename, "w")
-        for i in range(2):
+        for i in range(30):
             b_out, b_in, t = parties_test(p)
             bytes_sent.append(b_out)
             bytes_received.append(b_in)
@@ -414,6 +439,31 @@ def test_cases_parties():
         f.write(f'\tBytes received => Mean: {mean(bytes_received)}, Std Dev: {np.std(bytes_received)} \n')
         f.write(f'\tRuntime => Mean: {mean(computation_time)}, Std Dev: {np.std(computation_time)}\n')   
     f.close()
+
+def test_cases_parties2():
+    params = [2, 5, 10, 25, 50]
+    os.chdir("eval_results")
+
+    for p in params:
+        bytes_sent = []
+        bytes_received = []
+        computation_time = []
+        filename = f'parties2_{p}.txt'
+        f = open(filename, "w")
+        for i in range(30):
+            b_out, b_in, t = parties_test2(p)
+            bytes_sent.append(b_out)
+            bytes_received.append(b_in)
+            computation_time.append(t)
+            f.write(f'Run {str(i+1)}: \n')
+            f.write(f'\tBytes sent: {b_out}\n')
+            f.write(f'\tBytes received: {b_in}\n')
+            f.write(f'\tRuntime: {t}\n')
+        f.write(f'On average: \n')
+        f.write(f'\tBytes sent => Mean: {mean(bytes_sent)}, Std Dev: {np.std(bytes_sent)} \n')
+        f.write(f'\tBytes received => Mean: {mean(bytes_received)}, Std Dev: {np.std(bytes_received)} \n')
+        f.write(f'\tRuntime => Mean: {mean(computation_time)}, Std Dev: {np.std(computation_time)}\n')   
+    f.close()    
 
 def test_cases_secret_add():
     params = [1, 10, 50, 100, 200]
@@ -466,14 +516,14 @@ def test_cases_scalar_add():
     f.close()
 
 def test_cases_secret_mult():
-    params = [1, 10, 50, 100, 200]
+    params = [10, 200]
     os.chdir("eval_results")
 
     for p in params:
         bytes_sent = []
         bytes_received = []
         computation_time = []
-        filename = f'secret_add_{p}.txt'
+        filename = f'secret_mult_{p}.txt'
         f = open(filename, "w")
         for i in range(30):
             b_out, b_in, t = secret_mult_test(p)
@@ -490,6 +540,31 @@ def test_cases_secret_mult():
         f.write(f'\tRuntime => Mean: {mean(computation_time)}, Std Dev: {np.std(computation_time)}\n')  
     f.close()
 
+def test_cases_scalar_mult():
+    params = [5, 50, 100, 200, 500]
+    os.chdir("eval_results")
+
+    for p in params:
+        bytes_sent = []
+        bytes_received = []
+        computation_time = []
+        filename = f'scalar_mult_{p}.txt'
+        f = open(filename, "w")
+        for i in range(30):
+            b_out, b_in, t = scalar_mult_test(p)
+            bytes_sent.append(b_out)
+            bytes_received.append(b_in)
+            computation_time.append(t)
+            f.write(f'Run {str(i+1)}: \n')
+            f.write(f'\tBytes sent: {b_out}\n')
+            f.write(f'\tBytes received: {b_in}\n')
+            f.write(f'\tRuntime: {t}\n')
+        f.write(f'On average: \n')
+        f.write(f'\tBytes sent => Mean: {mean(bytes_sent)}, Std Dev: {np.std(bytes_sent)} \n')
+        f.write(f'\tBytes received => Mean: {mean(bytes_received)}, Std Dev: {np.std(bytes_received)} \n')
+        f.write(f'\tRuntime => Mean: {mean(computation_time)}, Std Dev: {np.std(computation_time)}\n')  
+    f.close()
+
 if __name__ == "__main__":
-    test_cases_parties()
+    secret_addition_test(3)
 

@@ -1,0 +1,124 @@
+Run 1: 
+	Bytes sent: 580.1
+	Bytes received: 1054.4
+	Runtime: 0.4499542236328125
+Run 2: 
+	Bytes sent: 581.0
+	Bytes received: 1057.1
+	Runtime: 0.33053181171417234
+Run 3: 
+	Bytes sent: 580.6
+	Bytes received: 1057.6
+	Runtime: 0.3593552827835083
+Run 4: 
+	Bytes sent: 581.8
+	Bytes received: 1057.9
+	Runtime: 0.3142586946487427
+Run 5: 
+	Bytes sent: 581.7
+	Bytes received: 1057.8
+	Runtime: 0.3149244785308838
+Run 6: 
+	Bytes sent: 580.6
+	Bytes received: 1054.9
+	Runtime: 0.37533705234527587
+Run 7: 
+	Bytes sent: 580.8
+	Bytes received: 1056.9
+	Runtime: 0.31439387798309326
+Run 8: 
+	Bytes sent: 580.8
+	Bytes received: 1057.8
+	Runtime: 0.3162214994430542
+Run 9: 
+	Bytes sent: 581.2
+	Bytes received: 1056.4
+	Runtime: 0.35578064918518065
+Run 10: 
+	Bytes sent: 580.6
+	Bytes received: 1052.2
+	Runtime: 0.3312590837478638
+Run 11: 
+	Bytes sent: 580.7
+	Bytes received: 1056.8
+	Runtime: 0.3083945751190186
+Run 12: 
+	Bytes sent: 580.7
+	Bytes received: 1056.8
+	Runtime: 0.34868974685668946
+Run 13: 
+	Bytes sent: 581.2
+	Bytes received: 1057.3
+	Runtime: 0.3642969369888306
+Run 14: 
+	Bytes sent: 580.7
+	Bytes received: 1055.9
+	Runtime: 0.36281557083129884
+Run 15: 
+	Bytes sent: 580.7
+	Bytes received: 1055.0
+	Runtime: 0.4198577642440796
+Run 16: 
+	Bytes sent: 580.4
+	Bytes received: 1055.6
+	Runtime: 0.3399533748626709
+Run 17: 
+	Bytes sent: 580.8
+	Bytes received: 1056.9
+	Runtime: 0.3157759189605713
+Run 18: 
+	Bytes sent: 580.7
+	Bytes received: 1055.0
+	Runtime: 0.35350451469421384
+Run 19: 
+	Bytes sent: 579.9
+	Bytes received: 1054.2
+	Runtime: 0.37003154754638673
+Run 20: 
+	Bytes sent: 580.5
+	Bytes received: 1056.6
+	Runtime: 0.3856295108795166
+Run 21: 
+	Bytes sent: 580.7
+	Bytes received: 1055.9
+	Runtime: 0.3579645872116089
+Run 22: 
+	Bytes sent: 580.2
+	Bytes received: 1055.4
+	Runtime: 0.30649054050445557
+Run 23: 
+	Bytes sent: 581.6
+	Bytes received: 1054.1
+	Runtime: 0.34391350746154786
+Run 24: 
+	Bytes sent: 581.3
+	Bytes received: 1055.6
+	Runtime: 0.3777014255523682
+Run 25: 
+	Bytes sent: 580.3
+	Bytes received: 1053.7
+	Runtime: 0.33037989139556884
+Run 26: 
+	Bytes sent: 580.6
+	Bytes received: 1054.9
+	Runtime: 0.35313279628753663
+Run 27: 
+	Bytes sent: 580.3
+	Bytes received: 1055.5
+	Runtime: 0.38226368427276614
+Run 28: 
+	Bytes sent: 580.8
+	Bytes received: 1056.9
+	Runtime: 0.31408569812774656
+Run 29: 
+	Bytes sent: 580.4
+	Bytes received: 1054.7
+	Runtime: 0.31927030086517333
+Run 30: 
+	Bytes sent: 581.2
+	Bytes received: 1056.4
+	Runtime: 0.3321057319641113
+On average: 
+	Bytes sent => Mean: 580.7633333333332, Std Dev: 0.44608170651674584 
+	Bytes received => Mean: 1055.8733333333334, Std Dev: 1.3620898975063456 
+	Runtime => Mean: 0.34827580928802493, Std Dev: 0.033165748439681245

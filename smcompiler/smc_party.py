@@ -66,8 +66,6 @@ class SMCParty:
         self.protocol_spec = protocol_spec
         self.value_dict = value_dict
         self.tripletIndex = 0
-        self.bytes_sent = 0
-        self.bytes_received = 0
         self.elapsed_time = 0
 
 
@@ -87,16 +85,15 @@ class SMCParty:
             for participant, share in zip(self.protocol_spec.participant_ids, shares):
                 # send share to participant using self.comm.send_private_message
                 #then, add the amount of bytes sent for evaluation part
-                self.bytes_sent += send_share(share, participant, secret.id, self.comm)
+                send_share(share, participant, secret.id, self.comm)
         # Process the expression
         result_share = self.process_expression(self.protocol_spec.expr)
         assert isinstance(result_share, Share)
         print(f"SMCParty: {self.client_id} has found the result share!")
         # Publish the result share.
-        self.bytes_sent += publish_result(result_share, self.comm)
+        publish_result(result_share, self.comm)
         # Retrieve the other resulting shares.
-        all_result_shares, byte_count = receive_public_results(self.comm,self.protocol_spec.participant_ids)
-        self.bytes_received += byte_count
+        all_result_shares = receive_public_results(self.comm,self.protocol_spec.participant_ids)
         print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
         reconstructed = reconstruct_shares(all_result_shares)
         self.elapsed_time = time.time() - start
@@ -126,8 +123,7 @@ class SMCParty:
     def handle_scalar(self, expression):
         return expression.value
     def handle_secret(self, expression):
-        received_share, received_bytes = retrieve_share(expression.id, self.comm)
-        self.bytes_received += received_bytes
+        received_share = retrieve_share(expression.id, self.comm)
         return received_share
     def handle_add(self, expression):
         leftSide = self.process_expression(expression.left)
@@ -149,11 +145,10 @@ class SMCParty:
                 # Each party locally computes a share of e = v - b
                 e_share = Share(index=r_expression.index, value=((r_expression.value - l_expression.beaver_triplets[1].value)%520633))
                 # broadcast d and e to all parties
-                self.bytes_sent += publish_triplet(d_share, self.comm, "d", self.tripletIndex)
-                self.bytes_sent += publish_triplet(e_share, self.comm, "e", self.tripletIndex)
+                publish_triplet(d_share, self.comm, "d", self.tripletIndex)
+                publish_triplet(e_share, self.comm, "e", self.tripletIndex)
                 # Get all the d and e values
-                (d,e,byte_count) = get_all_triplets(comm=self.comm, participant_ids=self.protocol_spec.participant_ids, secret_id=self.tripletIndex)
-                self.bytes_received += byte_count
+                (d,e) = get_all_triplets(comm=self.comm, participant_ids=self.protocol_spec.participant_ids, secret_id=self.tripletIndex)
                 l_expression.d = d
                 l_expression.e = e
                 self.tripletIndex += 1
