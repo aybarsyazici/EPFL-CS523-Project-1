@@ -73,7 +73,7 @@ def suite(parties, expr, expected):
 
     for result in results:
         print(f"Result: {result} (expected: {expected})")
-        assert result == expected
+        assert result == expected%default_q
 
 
 def test_suite1():
@@ -525,7 +525,7 @@ def test_eval_2():
     }
 
     expr = (walter_secrets[0] * Scalar(31) * saul_secrets[0] * Scalar(5) * mike_secrets[0] * Scalar(44) * gus_secrets[0]) * (Scalar(5) - walter_secrets[1] - Scalar(8) + saul_secrets[1] + Scalar(99) - mike_secrets[1] - Scalar(55) + gus_secrets[1] - Scalar(23))
-    expected = ( 3 * 31 * 14 * 5 * 12 * 44 * 66) * (5 - 57 - 8 + 2 + 99 - 9 - 55 + 321 - 23) 
+    expected = (3 * 31 * 2 * 5 * 1 * 44 * 3) * (5 - 5 - 8 + 2 + 99 - 4 - 55 + 2 - 23)
     suite(parties, expr, expected)
 
 
