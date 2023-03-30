@@ -149,7 +149,7 @@ class Student():
                 publish_triplet(d_share, self.comm, "d", self.tripletIndex)
                 publish_triplet(e_share, self.comm, "e", self.tripletIndex)
                 # Get all the d and e values
-                (d,e,byte_count) = get_all_triplets(comm=self.comm, participant_ids=self.cl.students, secret_id=self.tripletIndex)
+                (d,e) = get_all_triplets(comm=self.comm, participant_ids=self.cl.students, secret_id=self.tripletIndex)
                 l_expression.d = d
                 l_expression.e = e
                 self.tripletIndex += 1
