@@ -35,6 +35,7 @@ from secret_sharing import(
     get_beaver_triplet,
     publish_triplet,
     get_all_triplets,
+    default_q,
 )
 import time
 # Feel free to add as many imports as you want.
@@ -68,8 +69,6 @@ class SMCParty:
         self.tripletIndex = 0
         self.elapsed_time = 0
 
-
-
     def run(self) -> int:
         # Implementation of SMC protocol
         # Iterate over the secrets that this party is responsible for.
@@ -88,18 +87,22 @@ class SMCParty:
                 send_share(share, participant, secret.id, self.comm)
         # Process the expression
         result_share = self.process_expression(self.protocol_spec.expr)
-        assert isinstance(result_share, Share)
-        print(f"SMCParty: {self.client_id} has found the result share!")
-        # Publish the result share.
-        publish_result(result_share, self.comm)
-        # Retrieve the other resulting shares.
-        all_result_shares = receive_public_results(self.comm,self.protocol_spec.participant_ids)
-        print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
-        reconstructed = reconstruct_shares(all_result_shares)
-        self.elapsed_time = time.time() - start
-        #commented out for test purposes
-        #return reconstructed
-        return (reconstructed, self.comm.get_bytes_sent(), self.comm.get_bytes_received(), self.elapsed_time)
+        if(isinstance(result_share, Share)):
+            print(f"SMCParty: {self.client_id} has found the result share!")
+            # Publish the result share.
+            self.bytes_sent += publish_result(result_share, self.comm)
+            # Retrieve the other resulting shares.
+            all_result_shares, byte_count = receive_public_results(self.comm,self.protocol_spec.participant_ids)
+            self.bytes_received += byte_count
+            print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
+            reconstructed = reconstruct_shares(all_result_shares)
+            self.elapsed_time = time.time() - start
+            # Return the reconstructed results with the calculated metrics
+            return (reconstructed)
+        elif isinstance(result_share, int):
+            return result_share % default_q
+        else:
+            raise Exception("Result share is not of type Share or int")
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
@@ -139,11 +142,11 @@ class SMCParty:
         if isinstance(l_expression, Share) and isinstance(r_expression, Share):
             # Beaver Triplet logic
             if l_expression.beaver_triplets is None:
-                l_expression.beaver_triplets = get_beaver_triplet(self.comm, self.tripletIndex)
+                l_expression.beaver_triplets = get_beaver_triplet(comm=self.comm,secret_id=self.tripletIndex)
                 # Each party locally computes a share of d = s - a
-                d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)%520633))
+                d_share = Share(index=l_expression.index, value=((l_expression.value - l_expression.beaver_triplets[0].value)))
                 # Each party locally computes a share of e = v - b
-                e_share = Share(index=r_expression.index, value=((r_expression.value - l_expression.beaver_triplets[1].value)%520633))
+                e_share = Share(index=r_expression.index, value=((r_expression.value - l_expression.beaver_triplets[1].value)))
                 # broadcast d and e to all parties
                 publish_triplet(d_share, self.comm, "d", self.tripletIndex)
                 publish_triplet(e_share, self.comm, "e", self.tripletIndex)

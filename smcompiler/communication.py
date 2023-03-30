@@ -69,8 +69,8 @@ class Communication:
         self.bytes_sent += sys.getsizeof(message)
 
         url = f"{self.base_url}/private/{client_id_san}/{receiver_id_san}/{label_san}"
+        print(f"POST {url}")
         requests.post(url, message)
-
 
 
     def retrieve_private_message(
