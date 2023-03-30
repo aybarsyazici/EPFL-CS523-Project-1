@@ -90,10 +90,9 @@ class SMCParty:
         if(isinstance(result_share, Share)):
             print(f"SMCParty: {self.client_id} has found the result share!")
             # Publish the result share.
-            self.bytes_sent += publish_result(result_share, self.comm)
+            publish_result(result_share, self.comm)
             # Retrieve the other resulting shares.
-            all_result_shares, byte_count = receive_public_results(self.comm,self.protocol_spec.participant_ids)
-            self.bytes_received += byte_count
+            all_result_shares = receive_public_results(self.comm,self.protocol_spec.participant_ids)
             print(f"SMCParty: {self.client_id} has retrieved ALL shares", all_result_shares)
             reconstructed = reconstruct_shares(all_result_shares)
             self.elapsed_time = time.time() - start
