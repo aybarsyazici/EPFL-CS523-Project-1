@@ -1,0 +1,9 @@
+version: '3'
+services:
+  testing:
+    profiles: 
+      - testing
+    build: 
+      context: .
+      dockerfile: ./docker/testing_img/Dockerfile
+    container_name: cs523-testing
