@@ -291,11 +291,11 @@ def client_register(args: argparse.Namespace) -> None:
             raise ClientHTTPError("The client failed to register to the server!")
 
         issuance_res = res.content
-
+        print("[CLIENT]: Issuance_res: " + str(issuance_res))
         credential = client.process_registration_response(
             public_key, issuance_res, state
         )
-
+        print("[CLIENT]: Credential: " + str(credential))
         credential_fd.write(credential)
         credential_fd.flush()
 

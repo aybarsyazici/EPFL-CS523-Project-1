@@ -1,29 +1,25 @@
 """
 Classes that you need to complete.
 """
-
+from petrelic.multiplicative.pairing import G1
 from typing import Any, Dict, List, Union, Tuple
-
+from credential import AnonymousCredential, BlindSignature, PublicKey, SignatureScheme, IssueScheme, Attribute, BlindSignature, AttributeMap, Signature
+from petrelic.bn import Bn
 # Optional import
 from serialization import jsonpickle
 
 # Type aliases
-State = Any
-
+State = Bn
 
 class Server:
     """Server"""
-
+    subscriptions: List[str] = None
 
     def __init__(self):
         """
         Server constructor.
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
-
+        return
 
     @staticmethod
     def generate_ca(
@@ -44,7 +40,10 @@ class Server:
             You are free to design this as you see fit, but the return types
             should be encoded as bytes.
         """
-
+        appended_subscriptions = subscriptions + ["secret_key"]
+        sk, pk = SignatureScheme.generate_key(appended_subscriptions)
+        print(f"Created pk:{pk}")
+        return (jsonpickle.encode(sk).encode("utf-8"), jsonpickle.encode(pk).encode("utf-8"))
 
     def process_registration(
             self,
@@ -67,11 +66,24 @@ class Server:
             serialized response (the client should be able to build a
                 credential with this response).
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
-
+        server_pk = jsonpickle.decode(server_pk)
+        server_sk = jsonpickle.decode(server_sk)
+        print(f"Subscriptions sent to the server are " + str(subscriptions))
+        # Check if the subscriptions that are requested are valid
+        if not set(subscriptions).issubset(set(server_pk.subscriptions.keys())):
+            raise ValueError("[SERVER] Invalid subscriptions")
+        # We could check the users name and see if he has subscribed to the requested subscriptions
+        # but we will not do that here
+        issuer_attributes = {
+                subscription: Bn(1) 
+                for subscription in subscriptions 
+                }
+        issuer_attributes["username"] = Bn.from_binary(username.encode("utf-8"))
+        print(f"issuer_attributes are: " + str(issuer_attributes))
+        sign = IssueScheme.sign_issue_request(server_sk, server_pk, jsonpickle.decode(issuance_request), issuer_attributes)
+        blindSign = BlindSignature(sign=sign, attributes=issuer_attributes)
+        print("[SERVER] Returning blind sign: " + str(blindSign))
+        return jsonpickle.encode(blindSign)
 
     def check_request_signature(
         self,
@@ -104,11 +116,7 @@ class Client:
         """
         Client constructor.
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError()
-
+        self.secret = None
 
     def prepare_registration(
             self,
@@ -130,11 +138,21 @@ class Client:
                 from prepare_registration to proceed_registration_response.
                 You need to design the state yourself.
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
-
+        # Deserialize the server's public key
+        server_pk: PublicKey = jsonpickle.decode(server_pk)
+        print(f"Received Pk: {server_pk}")
+        # Check if the subscriptions are valid 
+        if not set(subscriptions).issubset(set(server_pk.subscriptions)):
+            raise ValueError("[CLIENT] Invalid subscriptions")
+        # create user attributes
+        attributes = dict()
+        # Subscriptions and username are server issued
+        # User will only have one secret key
+        self.secret = G1.order().random()
+        attributes["secret_key"] = self.secret 
+        # create issue req
+        issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk)
+        return (jsonpickle.encode(issue_req), t)
 
     def process_registration_response(
             self,
@@ -153,11 +171,16 @@ class Client:
         Return:
             credentials: create an attribute-based credential for the user
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
-
+        blindSign: BlindSignature = jsonpickle.decode(server_response)
+        sign: Signature = blindSign.sign
+        # Reconstruct the server's public key
+        server_pk = jsonpickle.decode(server_pk)
+        # user forms the signature = (h, H/h^t)
+        reconstructed_signature = Signature(sign.h, sign.H / (sign.h ** private_state))
+        all_attributes = blindSign.attributes
+        all_attributes["secret_key"] = self.secret
+        anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
+        return jsonpickle.encode(anonCred).encode("utf-8")
 
     def sign_request(
             self,

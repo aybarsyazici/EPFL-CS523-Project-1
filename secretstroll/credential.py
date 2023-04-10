@@ -21,17 +21,28 @@ from typing import Any, List, Tuple, Dict
 from serialization import jsonpickle
 from petrelic.multiplicative.pairing import G1, G2, G1Element, G2Element, GTElement
 from petrelic.bn import Bn
+from proof_handler import ProofHandler, PedersenProof
+Attribute = Bn
+AttributeMap = Dict[str, Attribute]
 
+DisclosureProof = Any
 # Type hint aliases
 # Feel free to change them as you see fit.
 # Maybe at the end, you will not need aliases at all!
 class PublicKey:
-    def __init__(self, g: G1Element, Y: List[G1Element], gh: G2Element, Xh: G2Element, Yh: List[G2Element]):
+    subscriptions: Dict[str, int] = None # This is a dictionary that maps a subscription to its index in the list of subscriptions
+    def __init__(self, g: G1Element, Y: List[G1Element], gh: G2Element, Xh: G2Element, Yh: List[G2Element], subscriptions: List[str]):
         self.g = g
         self.gh = gh
         self.Xh = Xh
         self.Y = Y
         self.Yh = Yh
+        self.subscriptions = {subscription: i for i, subscription in enumerate(subscriptions)}
+        print("Subscritpions: ", self.subscriptions)
+
+    # Override str method
+    def __str__(self):
+        return f"g:{self.g}, gh:{self.gh}, Xh:{self.Xh}, Y:{self.Y}, Yh:{self.Yh}, subscriptions: " + str(self.subscriptions)
 
 class SecretKey:
     def __init__(self, x: int, X: G1Element, y: List[int]):
@@ -43,43 +54,44 @@ class Signature:
     def __init__(self, h: G1Element, H: G1Element):
         self.h = h
         self.H = H
-Attribute = Any
-AttributeMap = Any
-IssueRequest = Any
-BlindSignature = Any
-AnonymousCredential = Any
-DisclosureProof = Any
+    def __str__(self):
+        return f"Signature | h: {self.h}, H: {self.H}"
 
+class BlindSignature:
+    def __init__(self, sign: Signature, attributes: AttributeMap):
+        self.sign = sign
+        self.attributes = attributes
+    def __str__(self):
+        return f"BlindSignature | {self.sign}, attributes: " + str(self.attributes)
+
+class AnonymousCredential:
+    def __init__(self, sign: Signature, attributes: AttributeMap):
+        self.sign = sign
+        self.attributes = attributes
 
 ######################
 ## SIGNATURE SCHEME ##
 ######################
-# Returns a random integer from Z_p, i.e., in [0, p-1].
-def random_Zp() -> Bn:
-    import random
-    # Acquire the prime order p.
-    p = G1.order().random()
-    return p
 
 # Class implementing the PS signature scheme.
 class SignatureScheme:
     @staticmethod
     def generate_key(
-            attribute_len: int
+            attributes: List[str]
         ) -> Tuple[SecretKey, PublicKey]:
         """ Generate signer key pair """
         # Generators
-        g: G1Element = G1.generator() ** random_Zp()
-        gh: G2Element = G2.generator() ** random_Zp()
+        g: G1Element = G1.generator() ** G1.order().random()
+        gh: G2Element = G2.generator() ** G1.order().random()
         # private keys
-        x = random_Zp()
+        x = G1.order().random()
         X: G1Element = g ** x
-        y = [random_Zp() for _ in range(attribute_len)]
+        y = [G1.order().random() for _ in range(len(attributes))]
         # public keys
         Xh: G2Element = gh ** x
         Y: List[G1Element] = [g ** y_i for y_i in y]
         Yh: List[G2Element] = [gh ** y_i for y_i in y]
-        return (SecretKey(x, X, y), PublicKey(g, Y, gh, Xh, Yh))
+        return (SecretKey(x, X, y), PublicKey(g, Y, gh, Xh, Yh,attributes))
     
     @staticmethod
     def sign(
@@ -93,7 +105,7 @@ class SignatureScheme:
         # We need to convert the messages into integers
         int_msgs = [Bn.from_binary(msg) for msg in msgs]
         # Now pick a random h
-        h = G1.generator() ** random_Zp()
+        h = G1.generator() ** G1.order().random()
         # The returned signature will beo of the form (h, H)
         # where H = h^(x + sum(y_i * m_i))
         exponent = sk.x + sum([sk.y[i] * int_msgs[i] for i in range(len(sk.y))])
@@ -116,10 +128,10 @@ class SignatureScheme:
         # We need to convert the messages into integers
         int_msgs = [Bn.from_binary(msg) for msg in msgs]
         # Now we need to compute the left hand side of the equation
-        # i.e., e(h, Xh) * prod(e(Yh_i, g^m_i))
+        # i.e., e(h, Xh * prod(Yh[i]^m_i)) 
         lhs = signature.h.pair(pk.Xh)
         for i in range(len(pk.Yh)):
-            lhs *= signature.h.pair(pk.Yh[i]** int_msgs[i])
+            lhs *= signature.h.pair(pk.Yh[i] ** int_msgs[i])
         # Now we need to compute the right hand side of the equation
         # i.e., e(H, gh)
         rhs = signature.H.pair(pk.gh)
@@ -133,41 +145,88 @@ class SignatureScheme:
 
 ## ISSUANCE PROTOCOL ##
 
-def create_issue_request(
-        pk: PublicKey,
-        user_attributes: AttributeMap
-    ) -> IssueRequest:
-    """ Create an issuance request
+class IssueRequest:
+    def __init__(self, c: G1Element, p_proof: PedersenProof):
+        self.c = c
+        self.proof = p_proof
 
-    This corresponds to the "user commitment" step in the issuance protocol.
+class IssueScheme:
+    @staticmethod
+    def create_issue_request(
+            pk: PublicKey,
+            user_attributes: AttributeMap
+        ) -> Tuple[IssueRequest, Bn]:
+        """ Create an issuance request
 
-    *Warning:* You may need to pass state to the `obtain_credential` function.
-    """
-    raise NotImplementedError()
+        This corresponds to the "user commitment" step in the issuance protocol.
+        """
+        # User will calculate a commitment
+        # c = g^t * prod(Y[i]^m[i])
+        # where t is a random integer
+        # and m[i] is the attribute value
+        # and Y[i] is the public key for the attribute
+        t = G1.order().random()
+        c = pk.g ** t
+        for attribute_name, attribute_value in user_attributes.items():
+            i = pk.subscriptions[attribute_name]
+            c *= pk.Y[i] ** attribute_value
+        # User will also create a proof using the ProofHandler
+        # get the public values necessary
+        pk_y_vals = []
+        secret_user_vals = []
+        for attr in user_attributes:
+            i = pk.subscriptions[attr]
+            pk_y_vals.append(pk.Y[i])
+            secret_user_vals.append(user_attributes[attr])
+        proof = ProofHandler.generate(
+            to_prove=c,
+            public_values=[pk.g] + pk_y_vals,
+            secret_values=[t] + secret_user_vals 
+        )
+        return IssueRequest(c, proof), t
 
+    @staticmethod
+    def sign_issue_request(
+            sk: SecretKey,
+            pk: PublicKey,
+            request: IssueRequest,
+            issuer_attributes: AttributeMap
+        ) -> Signature:
+        """ Create a signature corresponding to the user's request
 
-def sign_issue_request(
-        sk: SecretKey,
-        pk: PublicKey,
-        request: IssueRequest,
-        issuer_attributes: AttributeMap
-    ) -> BlindSignature:
-    """ Create a signature corresponding to the user's request
+        This corresponds to the "Issuer signing" step in the issuance protocol.
+        """
+        assert len(issuer_attributes) <= len(sk.y)
+        assert ProofHandler.verify(
+            to_prove=request.c,
+            proof=request.proof
+        )
+        # Issuer will do a blind signature
+        # It will add his attributes to the user's attributes
+        # and then sign the result
+        # h = g^u where u is a random integer
+        # H = (sk.X*request.c*prod(pk.Y[i]^issuer_attributes[i]))^u
+        u = G1.order().random()
+        h = pk.g ** u
+        H = (sk.X * request.c)
+        for attribute_name, attribute_value in issuer_attributes.items():
+            i = pk.subscriptions[attribute_name]
+            Y = pk.Y[i]
+            H *= Y**attribute_value
+        H = H**u
+        return Signature(h, H)
 
-    This corresponds to the "Issuer signing" step in the issuance protocol.
-    """
-    raise NotImplementedError()
+    @staticmethod
+    def obtain_credential(
+            pk: PublicKey,
+            t: Bn,
+            response: Signature
+        ) -> AnonymousCredential:
+        """ Derive a credential from the issuer's response
 
-
-def obtain_credential(
-        pk: PublicKey,
-        response: BlindSignature
-    ) -> AnonymousCredential:
-    """ Derive a credential from the issuer's response
-
-    This corresponds to the "Unblinding signature" step.
-    """
-    raise NotImplementedError()
+        This corresponds to the "Unblinding signature" step.
+        """
+        raise NotImplementedError()
 
 
 ## SHOWING PROTOCOL ##

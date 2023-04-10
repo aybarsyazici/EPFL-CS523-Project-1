@@ -9,8 +9,6 @@ services:
     volumes:
     - ./tor:/var/lib/tor
     - ./:/server
-    profiles:
-      - running
   client:
     build: ./docker/client_img
     image: cs523-client-img:latest
@@ -19,8 +17,6 @@ services:
       - cs523
     volumes:
     - ./:/client
-    profiles:
-      - running
 networks:
   cs523:
     driver: bridge

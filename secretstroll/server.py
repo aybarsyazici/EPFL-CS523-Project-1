@@ -140,6 +140,7 @@ def server_run(args: argparse.Namespace) -> None:
     DB.init_app(APP)
 
     SERVER = Server()
+    print("Server initialized.")
 
     host = "0.0.0.0"
     port = 8080
@@ -203,8 +204,8 @@ def register():
         username,
         subscriptions
     )
-
     server_res = make_response(registration_res)
+    print("[SERVER] Reg response: " + str(server_res))
     return server_res
 
 
