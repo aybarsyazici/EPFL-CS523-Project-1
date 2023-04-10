@@ -154,7 +154,8 @@ class IssueScheme:
     @staticmethod
     def create_issue_request(
             pk: PublicKey,
-            user_attributes: AttributeMap
+            user_attributes: AttributeMap,
+            testing: bool = False
         ) -> Tuple[IssueRequest, Bn]:
         """ Create an issuance request
 
@@ -178,12 +179,20 @@ class IssueScheme:
             i = pk.subscriptions[attr]
             pk_y_vals.append(pk.Y[i])
             secret_user_vals.append(user_attributes[attr])
-        proof = ProofHandler.generate(
-            to_prove=c,
-            public_values=[pk.g] + pk_y_vals,
-            secret_values=[t] + secret_user_vals 
-        )
-        return IssueRequest(c, proof), t
+        if testing: # if testing is set the true, we generate a wrong proof on purpose 
+            proof = ProofHandler.generate_wrong(
+                    to_prove = c,
+                    secret_values = [t] + secret_user_vals,
+                    public_values=[pk.g] + pk_y_vals,
+                    )
+            return IssueRequest(c, proof), t
+        else:
+            proof = ProofHandler.generate(
+                to_prove=c,
+                public_values=[pk.g] + pk_y_vals,
+                secret_values=[t] + secret_user_vals 
+            )
+            return IssueRequest(c, proof), t
 
     @staticmethod
     def sign_issue_request(
@@ -197,10 +206,11 @@ class IssueScheme:
         This corresponds to the "Issuer signing" step in the issuance protocol.
         """
         assert len(issuer_attributes) <= len(sk.y)
-        assert ProofHandler.verify(
+        if not ProofHandler.verify(
             to_prove=request.c,
             proof=request.proof
-        )
+            ):
+            raise Exception("Incorrect proof!")
         # Issuer will do a blind signature
         # It will add his attributes to the user's attributes
         # and then sign the result

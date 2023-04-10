@@ -1,4 +1,4 @@
-# Tor state file last generated on 2023-04-10 11:16:15 local time
+# Tor state file last generated on 2023-04-10 11:26:25 local time
 # Other times below are in UTC
 # You *do not* need to edit this file.
 
@@ -15,7 +15,7 @@ CircuitBuildTimeBin 175 25
 CircuitBuildTimeBin 185 25
 CircuitBuildTimeBin 195 23
 CircuitBuildTimeBin 205 27
-CircuitBuildTimeBin 215 15
+CircuitBuildTimeBin 215 16
 CircuitBuildTimeBin 225 25
 CircuitBuildTimeBin 235 20
 CircuitBuildTimeBin 245 17
@@ -103,10 +103,10 @@ CircuitBuildTimeBin 5605 1
 CircuitBuildTimeBin 8345 1
 CircuitBuildTimeBin 12395 1
 CircuitBuildTimeBin 16875 1
-CircuitBuildAbandonedCount 5
+CircuitBuildAbandonedCount 6
 Dormant 0
-Guard in=default rsa_id=AF0E2DF4861795CD4CECE2A25686D2BC70C96D03 nickname=ChuckyHorror sampled_on=2023-03-28T00:16:15 sampled_idx=0 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-30T23:57:46 confirmed_idx=1 pb_use_attempts=84.093750 pb_use_successes=84.093750 pb_circ_attempts=300.500000 pb_circ_successes=295.250000 pb_successful_circuits_closed=295.000000 pb_collapsed_circuits=0.250000 pb_timeouts=2.750000
-Guard in=default rsa_id=9F5068310818ED7C70B0BC4087AB55CB12CB4377 nickname=Doedel26 sampled_on=2023-04-01T04:35:22 sampled_idx=1 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-04-02T12:44:13 confirmed_idx=0 pb_use_attempts=79.312500 pb_use_successes=79.281250 pb_circ_attempts=209.500000 pb_circ_successes=206.375000 pb_successful_circuits_closed=206.125000 pb_collapsed_circuits=0.125000 pb_unusable_circuits=0.125000 pb_timeouts=0.875000
+Guard in=default rsa_id=AF0E2DF4861795CD4CECE2A25686D2BC70C96D03 nickname=ChuckyHorror sampled_on=2023-03-28T00:16:15 sampled_idx=0 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-30T23:57:46 confirmed_idx=1 pb_use_attempts=84.093750 pb_use_successes=84.093750 pb_circ_attempts=300.500000 pb_circ_successes=295.250000 pb_successful_circuits_closed=295.000000 pb_collapsed_circuits=0.250000 pb_timeouts=3.750000
+Guard in=default rsa_id=9F5068310818ED7C70B0BC4087AB55CB12CB4377 nickname=Doedel26 sampled_on=2023-04-01T04:35:22 sampled_idx=1 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-04-02T12:44:13 confirmed_idx=0 pb_use_attempts=80.312500 pb_use_successes=80.281250 pb_circ_attempts=210.500000 pb_circ_successes=207.375000 pb_successful_circuits_closed=207.125000 pb_collapsed_circuits=0.125000 pb_unusable_circuits=0.125000 pb_timeouts=0.875000
 Guard in=default rsa_id=7EEDD54E5457DA009E46C91BBF1F443DCEE01968 nickname=BEEzar sampled_on=2023-04-04T16:05:05 sampled_idx=2 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-29T10:40:33 confirmed_idx=2
 Guard in=default rsa_id=6C50CF56DFCC9B636964FEB7EE3B5051746E3278 nickname=k8r sampled_on=2023-04-02T09:15:38 sampled_idx=3 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=4FE32D5E9961DCF50B3CA3EC2ED41CCCB3FAE015 nickname=Reeses3 sampled_on=2023-04-04T16:22:46 sampled_idx=4 sampled_by=0.4.7.13 listed=1
@@ -125,6 +125,6 @@ Guard in=default rsa_id=D5A2B3AE1E8047017A0BBC7209FD624DB84D47CE nickname=komeru
 Guard in=default rsa_id=89FF4A0818D8BE9F8B71338D96A6B854F77F9FEC nickname=ddetor3 sampled_on=2023-04-01T19:22:54 sampled_idx=17 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=A4DE3FC1ACEC3767F5C4049BCEF57317E7B0583C nickname=eclipse12 sampled_on=2023-04-01T12:09:59 sampled_idx=18 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=F4CD29F48C34A88F771096FBFDBDE91B3CC2D911 nickname=okok2302 sampled_on=2023-04-01T19:57:32 sampled_idx=19 sampled_by=0.4.7.13 listed=1
-LastWritten 2023-04-10 11:16:15
+LastWritten 2023-04-10 11:26:25
 TorVersion Tor 0.4.7.13
-TotalBuildTimes 761
+TotalBuildTimes 763

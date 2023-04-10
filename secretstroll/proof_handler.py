@@ -74,3 +74,29 @@ class ProofHandler:
         # Check that the challenge is the same
         return challenge_prime == proof.challenge
 
+    @staticmethod
+    def generate_wrong(
+            to_prove: G1Element,
+            secret_values: List[int],
+            public_values: List[int],
+        ) -> PedersenProof:
+        """
+            Generate a proof that SHOULD fail the verification tests
+            ONLY USED for testing.
+        """
+        assert(len(secret_values) == len(public_values))
+        # For each secret value, we need to generate a random value
+        rands = [G1.order().random() for _ in secret_values]
+        # Knowing the random values, we can compute the commitment
+        # commitment = public_values[0] ** secret_values[0] * ... * public_values[n] ** secret_values[n]
+        commitment = G1.neutral_element()
+        for i in range(len(secret_values)):
+            commitment *= public_values[i] ** rands[i]
+        # We need to compute the challenge
+        challenge = calc_challenge(to_prove, commitment, public_values)
+        # We multiply the secret values by a random number here, to simulate the situation where the prover does NOT know the actual
+        # secret values.
+        response = [rands[i] + challenge * (secret_values[i]*G1.order().random()) for i in range(len(secret_values))]
+        print("[PROOF GENERATE]: Sending Response: " + str(response))
+        print("[PROOF GENERATE]: Public vals are: " + str(public_values))
+        return PedersenProof(challenge=challenge, response=response, public_values=public_values)

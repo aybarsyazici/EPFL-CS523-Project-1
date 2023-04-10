@@ -122,7 +122,8 @@ class Client:
             self,
             server_pk: bytes,
             username: str,
-            subscriptions: List[str]
+            subscriptions: List[str],
+            testing: bool = False
         ) -> Tuple[bytes, State]:
         """Prepare a request to register a new account on the server.
 
@@ -151,7 +152,7 @@ class Client:
         self.secret = G1.order().random()
         attributes["secret_key"] = self.secret 
         # create issue req
-        issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk)
+        issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
         return (jsonpickle.encode(issue_req), t)
 
     def process_registration_response(

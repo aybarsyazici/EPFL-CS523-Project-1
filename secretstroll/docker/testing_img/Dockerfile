@@ -30,7 +30,10 @@ RUN mkdir -p /testing/data
 RUN mkdir -p /testing/code
 
 COPY ./credential.py /testing/code
+COPY ./stroll.py /testing/code
+COPY ./proof_handler.py /testing/code
 COPY ./test_signaturescheme.py /testing/code
+COPY ./test_registrationscheme.py /testing/code
 COPY ./serialization.py /testing/code
 
 COPY ./requirements.txt /testing/
