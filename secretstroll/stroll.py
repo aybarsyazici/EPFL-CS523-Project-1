@@ -3,7 +3,20 @@ Classes that you need to complete.
 """
 from petrelic.multiplicative.pairing import G1
 from typing import Any, Dict, List, Union, Tuple
-from credential import AnonymousCredential, BlindSignature, PublicKey, SignatureScheme, IssueScheme, Attribute, BlindSignature, AttributeMap, Signature
+from credential import (
+    AnonymousCredential,
+    BlindSignature, 
+    PublicKey, 
+    SecretKey, 
+    SignatureScheme, 
+    IssueScheme, 
+    Attribute, 
+    BlindSignature, 
+    AttributeMap, 
+    Signature,
+    DisclosureProof,
+    verify_disclosure_proof
+    )
 from petrelic.bn import Bn
 # Optional import
 from serialization import jsonpickle
@@ -42,7 +55,6 @@ class Server:
         """
         appended_subscriptions = subscriptions + ["secret_key"]
         sk, pk = SignatureScheme.generate_key(appended_subscriptions)
-        print(f"Created pk:{pk}")
         return (jsonpickle.encode(sk).encode("utf-8"), jsonpickle.encode(pk).encode("utf-8"))
 
     def process_registration(
@@ -66,21 +78,21 @@ class Server:
             serialized response (the client should be able to build a
                 credential with this response).
         """
-        server_pk = jsonpickle.decode(server_pk)
-        server_sk = jsonpickle.decode(server_sk)
+        server_pk_parsed: PublicKey = jsonpickle.decode(server_pk)
+        server_sk_parsed: SecretKey = jsonpickle.decode(server_sk)
         print(f"Subscriptions sent to the server are " + str(subscriptions))
         # Check if the subscriptions that are requested are valid
-        if not set(subscriptions).issubset(set(server_pk.subscriptions.keys())):
+        if not set(subscriptions).issubset(set(server_pk_parsed.subscriptions.keys())):
             raise ValueError("[SERVER] Invalid subscriptions")
         # We could check the users name and see if he has subscribed to the requested subscriptions
         # but we will not do that here
         issuer_attributes = {
                 subscription: Bn(1) 
                 for subscription in subscriptions 
-                }
+        }
         issuer_attributes["username"] = Bn.from_binary(username.encode("utf-8"))
         print(f"issuer_attributes are: " + str(issuer_attributes))
-        sign = IssueScheme.sign_issue_request(server_sk, server_pk, jsonpickle.decode(issuance_request), issuer_attributes)
+        sign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
         blindSign = BlindSignature(sign=sign, attributes=issuer_attributes)
         print("[SERVER] Returning blind sign: " + str(blindSign))
         return jsonpickle.encode(blindSign)
@@ -103,10 +115,23 @@ class Server:
         Returns:
             whether a signature is valid
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
+        server_pk = jsonpickle.decode(server_pk)
+
+        proof: DisclosureProof = jsonpickle.decode(signature)
+        disclosed_attributes = proof.revealed_attributes
+        print("[SERVER] Disclosed attributes are: " + str(disclosed_attributes))
+        for attr in revealed_attributes:
+            print("[SERVER] Checking if " + str(attr) + " was disclosed")
+            try:
+                #print(attr,disclosed_attributes)
+                #if one of the revealed attributes was not subscribed...invalidate signature
+                if disclosed_attributes[attr] == 0:
+                    return False  
+            except:
+                #the attr that the user wants to prove he has a valid subscription for, was not disclosed
+                return False  
+
+        return verify_disclosure_proof(server_pk,proof,message)
 
 
 class Client:
@@ -141,7 +166,6 @@ class Client:
         """
         # Deserialize the server's public key
         server_pk: PublicKey = jsonpickle.decode(server_pk)
-        print(f"Received Pk: {server_pk}")
         # Check if the subscriptions are valid 
         if not set(subscriptions).issubset(set(server_pk.subscriptions)):
             raise ValueError("[CLIENT] Invalid subscriptions")
@@ -201,7 +225,20 @@ class Client:
         Returns:
             A message's signature (serialized)
         """
-        ###############################################
-        # TODO: Complete this function.
-        ###############################################
-        raise NotImplementedError
+        server_pk_parsed:PublicKey = jsonpickle.decode(server_pk)
+        credential_parsed:AnonymousCredential = jsonpickle.decode(credentials)
+        # Check if the types are valid
+        if not set(types).issubset(set(credential_parsed.attributes.keys())):
+            raise ValueError("[CLIENT] Invalid types")
+        # Check if the types are valid
+        if not set(types).issubset(set(server_pk_parsed.subscriptions.keys())):
+            raise ValueError("[CLIENT] Invalid types")
+        # Create the disclosure proof
+        disclosure_proof = DisclosureProof.create_disclosure_proof(
+                credential_parsed,
+                types,
+                server_pk_parsed,
+                message
+                )
+        return jsonpickle.encode(disclosure_proof).encode("utf-8")
+

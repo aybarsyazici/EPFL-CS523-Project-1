@@ -17,6 +17,7 @@ the functions provided to resemble a more object-oriented interface.
 
 from math import prod
 from typing import Any, List, Tuple, Dict
+from functools import reduce
 
 from serialization import jsonpickle
 from petrelic.multiplicative.pairing import G1, G2, G1Element, G2Element, GTElement
@@ -25,7 +26,6 @@ from proof_handler import ProofHandler, PedersenProof
 Attribute = Bn
 AttributeMap = Dict[str, Attribute]
 
-DisclosureProof = Any
 # Type hint aliases
 # Feel free to change them as you see fit.
 # Maybe at the end, you will not need aliases at all!
@@ -68,6 +68,8 @@ class AnonymousCredential:
     def __init__(self, sign: Signature, attributes: AttributeMap):
         self.sign = sign
         self.attributes = attributes
+    def __str__(self):
+        return f"AnonymousCredential | {self.sign}, attributes: " + str(self.attributes)
 
 ######################
 ## SIGNATURE SCHEME ##
@@ -241,15 +243,46 @@ class IssueScheme:
 
 ## SHOWING PROTOCOL ##
 
-def create_disclosure_proof(
-        pk: PublicKey,
-        credential: AnonymousCredential,
-        hidden_attributes: List[Attribute],
-        message: bytes
-    ) -> DisclosureProof:
-    """ Create a disclosure proof """
-    raise NotImplementedError()
+class DisclosureProof:
 
+    def __init__(self, proof: PedersenProof, revealed_attributes: AttributeMap, random_sign: Signature, to_prove: G1Element):
+        self.proof = proof
+        self.revealed_attributes = revealed_attributes
+        self.random_sign = random_sign
+        self.to_prove = to_prove
+
+    @staticmethod
+    def create_disclosure_proof(
+                 credential: AnonymousCredential,
+                 revealed_attributes: List[str],
+                 pk: PublicKey,
+                 message: bytes):
+        # Convert the message into an integer m.
+        m = Bn.from_binary(message)
+        # User picks random values r,t
+        r = G1.order().random()
+        t = G1.order().random()
+        # Computes randomized signature
+        h_new = credential.sign.h ** r
+        H_new = (credential.sign.H * (credential.sign.h**t)) ** r
+        random_sign = Signature(h_new, H_new)
+        # Compute the hidden attributes
+        hidden_attributes = [t]
+        public_vals = [random_sign.h.pair(pk.gh)]
+        revealed_attributes_map = {attr: credential.attributes[attr] for attr in revealed_attributes}
+        for attr, val in credential.attributes.items():
+            if attr not in revealed_attributes:
+                hidden_attributes.append(val)
+                public_vals.append(random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
+        to_prove = reduce(lambda x,y: x*y, (public_vals[i]**hidden_attributes[i] for i in range(len(public_vals))))
+        # Create the proof
+        proof = ProofHandler.generate(
+            to_prove=to_prove,
+            public_values=public_vals,
+            secret_values=hidden_attributes,
+            message=m
+        )
+        return DisclosureProof(proof, revealed_attributes_map, random_sign, to_prove)
 
 def verify_disclosure_proof(
         pk: PublicKey,
@@ -260,4 +293,36 @@ def verify_disclosure_proof(
 
     Hint: The verifier may also want to retrieve the disclosed attributes
     """
-    raise NotImplementedError()
+    # First check if the proof is well formed
+    print("[SERVER] Verifying Disclosure Proof")
+    if disclosure_proof.random_sign.h == G1.neutral_element():
+        print("[SERVER] Disclosure Proof is not well formed")
+        return False
+    print("[SERVER] Disclosure Proof is well formed")
+    # Reconstruct the value to be proven by using the disclosed attributes
+    for attr,val in disclosure_proof.revealed_attributes.items():
+        print("[SERVER] Attribute: ", attr, " Value: ", val)
+    reconstructed = disclosure_proof.random_sign.H.pair(pk.gh) * reduce(
+        lambda x,y: x*y, (disclosure_proof.random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]) ** (-val) for attr,val in disclosure_proof.revealed_attributes.items())
+    )
+    reconstructed = reconstructed / disclosure_proof.random_sign.h.pair(pk.Xh)
+    print("[SERVER] Reconstructed value: ", reconstructed)
+    print("[SERVER] Value to prove: ", disclosure_proof.to_prove)
+    # Convert the message into an integer m.
+    m = Bn.from_binary(message)
+    # Verify the proof
+    if not (ProofHandler.verify(
+        to_prove=reconstructed,
+        proof=disclosure_proof.proof,
+        message=m
+    )): 
+        print("[SERVER] Proof Handler returned false")
+        return False 
+    print("[SERVER] Proof Handler returned true")
+    if(reconstructed != disclosure_proof.to_prove):
+        print("[SERVER] Reconstructed value is not equal to the value to prove")
+        return False
+    print("[SERVER] Reconstructed value is equal to the value to prove")
+    return True
+
+

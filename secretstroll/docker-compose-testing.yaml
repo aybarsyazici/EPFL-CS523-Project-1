@@ -1,9 +1,9 @@
-version: '3'
+version: "3"
 services:
   testing:
-    profiles: 
-      - testing
-    build: 
+    build:
       context: .
       dockerfile: ./docker/testing_img/Dockerfile
     container_name: cs523-testing
+    restart: "no"
+    entrypoint: sh -c "cd ./testing/code && pytest"

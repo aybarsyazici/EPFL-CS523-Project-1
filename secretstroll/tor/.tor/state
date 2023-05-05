@@ -1,26 +1,26 @@
-# Tor state file last generated on 2023-04-10 11:26:25 local time
+# Tor state file last generated on 2023-05-05 15:16:09 local time
 # Other times below are in UTC
 # You *do not* need to edit this file.
 
 CircuitBuildTimeBin 85 4
 CircuitBuildTimeBin 95 8
 CircuitBuildTimeBin 105 9
-CircuitBuildTimeBin 115 24
+CircuitBuildTimeBin 115 25
 CircuitBuildTimeBin 125 14
-CircuitBuildTimeBin 135 28
-CircuitBuildTimeBin 145 30
+CircuitBuildTimeBin 135 29
+CircuitBuildTimeBin 145 31
 CircuitBuildTimeBin 155 37
-CircuitBuildTimeBin 165 26
-CircuitBuildTimeBin 175 25
-CircuitBuildTimeBin 185 25
-CircuitBuildTimeBin 195 23
-CircuitBuildTimeBin 205 27
-CircuitBuildTimeBin 215 16
-CircuitBuildTimeBin 225 25
-CircuitBuildTimeBin 235 20
-CircuitBuildTimeBin 245 17
+CircuitBuildTimeBin 165 27
+CircuitBuildTimeBin 175 29
+CircuitBuildTimeBin 185 27
+CircuitBuildTimeBin 195 25
+CircuitBuildTimeBin 205 28
+CircuitBuildTimeBin 215 19
+CircuitBuildTimeBin 225 29
+CircuitBuildTimeBin 235 21
+CircuitBuildTimeBin 245 19
 CircuitBuildTimeBin 255 20
-CircuitBuildTimeBin 265 20
+CircuitBuildTimeBin 265 22
 CircuitBuildTimeBin 275 15
 CircuitBuildTimeBin 285 15
 CircuitBuildTimeBin 295 16
@@ -29,7 +29,7 @@ CircuitBuildTimeBin 315 7
 CircuitBuildTimeBin 325 9
 CircuitBuildTimeBin 335 9
 CircuitBuildTimeBin 345 10
-CircuitBuildTimeBin 355 9
+CircuitBuildTimeBin 355 12
 CircuitBuildTimeBin 365 5
 CircuitBuildTimeBin 375 11
 CircuitBuildTimeBin 385 13
@@ -43,7 +43,7 @@ CircuitBuildTimeBin 455 10
 CircuitBuildTimeBin 465 3
 CircuitBuildTimeBin 475 13
 CircuitBuildTimeBin 485 10
-CircuitBuildTimeBin 495 6
+CircuitBuildTimeBin 495 7
 CircuitBuildTimeBin 505 2
 CircuitBuildTimeBin 515 6
 CircuitBuildTimeBin 525 6
@@ -105,12 +105,12 @@ CircuitBuildTimeBin 12395 1
 CircuitBuildTimeBin 16875 1
 CircuitBuildAbandonedCount 6
 Dormant 0
-Guard in=default rsa_id=AF0E2DF4861795CD4CECE2A25686D2BC70C96D03 nickname=ChuckyHorror sampled_on=2023-03-28T00:16:15 sampled_idx=0 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-30T23:57:46 confirmed_idx=1 pb_use_attempts=84.093750 pb_use_successes=84.093750 pb_circ_attempts=300.500000 pb_circ_successes=295.250000 pb_successful_circuits_closed=295.000000 pb_collapsed_circuits=0.250000 pb_timeouts=3.750000
-Guard in=default rsa_id=9F5068310818ED7C70B0BC4087AB55CB12CB4377 nickname=Doedel26 sampled_on=2023-04-01T04:35:22 sampled_idx=1 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-04-02T12:44:13 confirmed_idx=0 pb_use_attempts=80.312500 pb_use_successes=80.281250 pb_circ_attempts=210.500000 pb_circ_successes=207.375000 pb_successful_circuits_closed=207.125000 pb_collapsed_circuits=0.125000 pb_unusable_circuits=0.125000 pb_timeouts=0.875000
+Guard in=default rsa_id=AF0E2DF4861795CD4CECE2A25686D2BC70C96D03 nickname=ChuckyHorror sampled_on=2023-03-28T00:16:15 sampled_idx=0 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-30T23:57:46 confirmed_idx=1 pb_use_attempts=93.093750 pb_use_successes=93.093750 pb_circ_attempts=161.750000 pb_circ_successes=158.625000 pb_successful_circuits_closed=158.500000 pb_collapsed_circuits=0.125000 pb_timeouts=1.875000
+Guard in=default rsa_id=9F5068310818ED7C70B0BC4087AB55CB12CB4377 nickname=Doedel26 sampled_on=2023-04-01T04:35:22 sampled_idx=1 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-04-02T12:44:13 confirmed_idx=0 pb_use_attempts=93.312500 pb_use_successes=93.281250 pb_circ_attempts=228.500000 pb_circ_successes=225.375000 pb_successful_circuits_closed=225.125000 pb_collapsed_circuits=0.125000 pb_unusable_circuits=0.125000 pb_timeouts=0.875000
 Guard in=default rsa_id=7EEDD54E5457DA009E46C91BBF1F443DCEE01968 nickname=BEEzar sampled_on=2023-04-04T16:05:05 sampled_idx=2 sampled_by=0.4.7.13 listed=1 confirmed_on=2023-03-29T10:40:33 confirmed_idx=2
 Guard in=default rsa_id=6C50CF56DFCC9B636964FEB7EE3B5051746E3278 nickname=k8r sampled_on=2023-04-02T09:15:38 sampled_idx=3 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=4FE32D5E9961DCF50B3CA3EC2ED41CCCB3FAE015 nickname=Reeses3 sampled_on=2023-04-04T16:22:46 sampled_idx=4 sampled_by=0.4.7.13 listed=1
-Guard in=default rsa_id=2542042300D100B113C41375CC8B2C7A237B370D nickname=Nightbreaker sampled_on=2023-03-31T12:22:23 sampled_idx=5 sampled_by=0.4.7.13 listed=1
+Guard in=default rsa_id=2542042300D100B113C41375CC8B2C7A237B370D nickname=Nightbreaker sampled_on=2023-03-31T12:22:23 sampled_idx=5 sampled_by=0.4.7.13 unlisted_since=2023-05-02T03:57:56 listed=0
 Guard in=default rsa_id=04C3468BE24740347CBCC00534C940DBCBCABC82 nickname=aaron0x10c sampled_on=2023-04-02T18:35:05 sampled_idx=6 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=A9E43431EF473BEEF0EEC98DBDDD1B8C3E3FB071 nickname=torthias sampled_on=2023-03-27T12:30:05 sampled_idx=7 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=F72AF9F63CD443B2CC7FEB8552EC588EF1992F0A nickname=sklep sampled_on=2023-04-05T18:02:23 sampled_idx=8 sampled_by=0.4.7.13 listed=1
@@ -122,9 +122,9 @@ Guard in=default rsa_id=9CAD380288FC086E6806A59E9C4072CD75F26220 nickname=enif s
 Guard in=default rsa_id=039A383F8CE5B98D1A84D2838D24930657E472E0 nickname=BoomStick sampled_on=2023-04-02T02:07:15 sampled_idx=14 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=10761183265E627529BC250B6A6645ED980D9697 nickname=jstark1809tm sampled_on=2023-04-03T12:32:35 sampled_idx=15 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=D5A2B3AE1E8047017A0BBC7209FD624DB84D47CE nickname=komeru2 sampled_on=2023-04-04T10:21:15 sampled_idx=16 sampled_by=0.4.7.13 listed=1
-Guard in=default rsa_id=89FF4A0818D8BE9F8B71338D96A6B854F77F9FEC nickname=ddetor3 sampled_on=2023-04-01T19:22:54 sampled_idx=17 sampled_by=0.4.7.13 listed=1
+Guard in=default rsa_id=89FF4A0818D8BE9F8B71338D96A6B854F77F9FEC nickname=ddetor3 sampled_on=2023-04-01T19:22:54 sampled_idx=17 sampled_by=0.4.7.13 unlisted_since=2023-05-03T08:05:47 listed=0
 Guard in=default rsa_id=A4DE3FC1ACEC3767F5C4049BCEF57317E7B0583C nickname=eclipse12 sampled_on=2023-04-01T12:09:59 sampled_idx=18 sampled_by=0.4.7.13 listed=1
 Guard in=default rsa_id=F4CD29F48C34A88F771096FBFDBDE91B3CC2D911 nickname=okok2302 sampled_on=2023-04-01T19:57:32 sampled_idx=19 sampled_by=0.4.7.13 listed=1
-LastWritten 2023-04-10 11:26:25
+LastWritten 2023-05-05 15:16:09
 TorVersion Tor 0.4.7.13
-TotalBuildTimes 763
+TotalBuildTimes 792
