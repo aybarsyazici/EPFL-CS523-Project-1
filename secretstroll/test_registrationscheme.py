@@ -69,9 +69,3 @@ def test_simple_failed_reg():
         return
     
     assert False
-
-# main
-if __name__ == "__main__":
-    test_simpleregistration()
-    #test_simple_failed_reg()
-    print("Everything passed")

@@ -205,7 +205,6 @@ def register():
         subscriptions
     )
     server_res = make_response(registration_res)
-    print("[SERVER] Reg response: " + str(server_res))
     return server_res
 
 
