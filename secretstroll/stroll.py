@@ -83,7 +83,8 @@ class Server:
         print(f"Subscriptions sent to the server are " + str(subscriptions))
         # Check if the subscriptions that are requested are valid
         if not set(subscriptions).issubset(set(server_pk_parsed.subscriptions.keys())):
-            raise ValueError("[SERVER] Invalid subscriptions")
+            return None
+            #raise ValueError("[SERVER] Invalid subscriptions")
         # We could check the users name and see if he has subscribed to the requested subscriptions
         # but we will not do that here
         issuer_attributes = {
@@ -168,7 +169,8 @@ class Client:
         server_pk: PublicKey = jsonpickle.decode(server_pk)
         # Check if the subscriptions are valid 
         if not set(subscriptions).issubset(set(server_pk.subscriptions)):
-            raise ValueError("[CLIENT] Invalid subscriptions")
+            return None, None
+            #raise ValueError("[CLIENT] Invalid subscriptions")
         # create user attributes
         attributes = dict()
         # Subscriptions and username are server issued
