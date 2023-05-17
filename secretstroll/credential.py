@@ -153,7 +153,6 @@ class IssueRequest:
         self.proof = p_proof
 
 class IssueScheme:
-    @staticmethod
     def create_issue_request(
             pk: PublicKey,
             user_attributes: AttributeMap,

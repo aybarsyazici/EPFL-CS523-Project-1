@@ -1,6 +1,9 @@
 from stroll import Server,Client
 from credential import AnonymousCredential
 from serialization import jsonpickle
+from measurement import measured
+import time
+import sys
 
 def test_simpleregistration():
     """
@@ -212,6 +215,5 @@ def test_with_multiple_clients():
     assert inv_res1 is False
     assert inv_res3 is False
 
-
-if __name__ == "__main__":
-    test_with_multiple_clients()
+#if __name__ == "__main__":
+    #test_with_multiple_clients()

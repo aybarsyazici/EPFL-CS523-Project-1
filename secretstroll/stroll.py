@@ -20,6 +20,10 @@ from credential import (
 from petrelic.bn import Bn
 # Optional import
 from serialization import jsonpickle
+import time
+import sys
+from measurement import measured
+
 
 # Type aliases
 State = Bn
@@ -28,15 +32,18 @@ class Server:
     """Server"""
     subscriptions: List[str] = None
 
-    def __init__(self):
+    def __init__(self, measurement_mode=False):
         """
         Server constructor.
         """
+        self.measurement_mode = measurement_mode
         return
 
     @staticmethod
     def generate_ca(
-            subscriptions: List[str]
+            subscriptions: List[str],
+            measurement_mode = False,
+            measurements = None
         ) -> Tuple[bytes, bytes]:
         """Initializes the credential system. Runs exactly once in the
         beginning. Decides on schemes public parameters and choses a secret key
@@ -54,7 +61,12 @@ class Server:
             should be encoded as bytes.
         """
         appended_subscriptions = subscriptions + ["secret_key"]
-        sk, pk = SignatureScheme.generate_key(appended_subscriptions)
+        
+        if measurement_mode:
+            sk, pk = measured(SignatureScheme.generate_key, measurements["signature"]["generate_key"])(appended_subscriptions)
+        else:
+            sk, pk = SignatureScheme.generate_key(appended_subscriptions)    
+
         return (jsonpickle.encode(sk).encode("utf-8"), jsonpickle.encode(pk).encode("utf-8"))
 
     def process_registration(
@@ -63,7 +75,8 @@ class Server:
             server_pk: bytes,
             issuance_request: bytes,
             username: str,
-            subscriptions: List[str]
+            subscriptions: List[str],
+            measurements= None
         ) -> bytes:
         """ Registers a new account on the server.
 
@@ -93,7 +106,13 @@ class Server:
         }
         issuer_attributes["username"] = Bn.from_binary(username.encode("utf-8"))
         print(f"issuer_attributes are: " + str(issuer_attributes))
-        sign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
+
+        if self.measurement_mode:
+            sign = measured(IssueScheme.sign_issue_request, measurements["issuance"]["sign_issue_request"])(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
+        else:
+            sign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
+
+
         blindSign = BlindSignature(sign=sign, attributes=issuer_attributes)
         print("[SERVER] Returning blind sign: " + str(blindSign))
         return jsonpickle.encode(blindSign)
@@ -138,18 +157,20 @@ class Server:
 class Client:
     """Client"""
 
-    def __init__(self):
+    def __init__(self, measurement_mode=False):
         """
         Client constructor.
         """
         self.secret = None
+        self.measurement_mode = measurement_mode
 
     def prepare_registration(
             self,
             server_pk: bytes,
             username: str,
             subscriptions: List[str],
-            testing: bool = False
+            testing: bool = False,
+            measurements=False
         ) -> Tuple[bytes, State]:
         """Prepare a request to register a new account on the server.
 
@@ -178,7 +199,10 @@ class Client:
         self.secret = G1.order().random()
         attributes["secret_key"] = self.secret 
         # create issue req
-        issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
+        if self.measurement_mode:
+            issue_req, t = measured(IssueScheme.create_issue_request, measurements["issuance"]["create_issue_request"])(user_attributes=attributes, pk=server_pk, testing=testing)
+        else:
+            issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
         return (jsonpickle.encode(issue_req), t)
 
     def process_registration_response(
@@ -204,6 +228,7 @@ class Client:
         server_pk = jsonpickle.decode(server_pk)
         # user forms the signature = (h, H/h^t)
         reconstructed_signature = Signature(sign.h, sign.H / (sign.h ** private_state))
+
         all_attributes = blindSign.attributes
         all_attributes["secret_key"] = self.secret
         anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
@@ -231,10 +256,12 @@ class Client:
         credential_parsed:AnonymousCredential = jsonpickle.decode(credentials)
         # Check if the types are valid
         if not set(types).issubset(set(credential_parsed.attributes.keys())):
-            raise ValueError("[CLIENT] Invalid types")
+            return None
+            #raise ValueError("[CLIENT] Invalid types")
         # Check if the types are valid
         if not set(types).issubset(set(server_pk_parsed.subscriptions.keys())):
-            raise ValueError("[CLIENT] Invalid types")
+            return None
+            #raise ValueError("[CLIENT] Invalid types")
         # Create the disclosure proof
         disclosure_proof = DisclosureProof.create_disclosure_proof(
                 credential_parsed,
