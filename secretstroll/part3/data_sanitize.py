@@ -65,7 +65,9 @@ class Data:
                  min_outgoing_freq,
                  min_incoming_freq,
                  max_outgoing_freq,
-                 max_incoming_freq
+                 max_incoming_freq,
+                 avg_outgoing_ordering,
+                 std_outgoing_ordering,
                  ):
         self.label = label
         self.num_outgoing = num_outgoing
@@ -91,6 +93,8 @@ class Data:
         self.min_incoming_freq = min_incoming_freq
         self.max_outgoing_freq = max_outgoing_freq
         self.max_incoming_freq = max_incoming_freq
+        self.avg_outgoing_ordering = avg_outgoing_ordering
+        self.std_outgoing_ordering = std_outgoing_ordering
 
     def to_numpy(self):
         return np.array([
@@ -117,7 +121,9 @@ class Data:
             self.min_outgoing_freq,
             self.min_incoming_freq,
             self.max_outgoing_freq,
-            self.max_incoming_freq
+            self.max_incoming_freq,
+            self.avg_outgoing_ordering,
+            self.std_outgoing_ordering,
         ])
 
 def get_traces() -> List[NetworkTrace]:
@@ -242,11 +248,22 @@ def feature_extraction(trace: NetworkTrace):
         max_incoming_freq=max_incoming_freq,
         min_outgoing_freq=min_outgoing_freq,
         min_incoming_freq=min_incoming_freq,
+        avg_outgoing_ordering=avg_outgoing_ordering,
+        std_outgoing_ordering=std_outgoing_ordering,
         )
     )
 
+def get_training_data_from_traces(traces):
+    """
+    Takes a dict of traces and returns a list of Data objects
+    """
+    data = []
+    for grid, traces in traces.items():
+        for trace in traces:
+            data.append(feature_extraction(trace).to_numpy())
+    return data
 
-def get_training_data():
+def get_saved_training_data():
     """
     Reads the data written in ./data/extracted_features_per_grid
 
@@ -260,7 +277,7 @@ def get_training_data():
         raise Exception("No files found in ./data/extracted_features_per_grid, has data_collect.py & data_sanitize.py been run?")
     # read the files
     data = []
-    for file in files:
+    for file in tqdm(files, desc="Reading saved data"):
         data.append(np.load(file, allow_pickle=True))
     # return the data
     return np.concatenate(data)
