@@ -1,0 +1,11 @@
+numpy
+tqdm
+scapy
+scikit-learn
+matplotlib
+python-pcapng
+dpkt
+scipy
+tensorflow-metal
+tensorflow-macos
+pandas
