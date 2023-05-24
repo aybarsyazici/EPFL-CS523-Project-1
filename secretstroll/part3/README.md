@@ -39,6 +39,26 @@ This will run the data collection procedure on grids [1, 100] with 50 traces per
 
 WARNING: Takes a lot of time!
 
+After running this there will be the data collected as .pcapng files under the ./data directory. To run the the fingerprinting, we need to extract features from these files. This can be done in two ways:
+
+1. import data_sanitize.py and run:
+```python
+# Get traces
+traces = data_sanitize.get_traces()
+# Now get the features from the traces, returns numpy array
+training_data = data_sanitize.get_training_data_from_traces(traces)
+```
+2. Or instead of importing data_sanitize.py you can run it from the command line:
+```bash
+python3 ./data_sanitizer.py
+```
+Which will done the steps described above and save the training data as .npy files of each grid under ./data/features_extracted_per_grid. 
+You can import these data and convert them to numpy arrays manually or again you can import data_sanitize.py and just run:
+```python
+# This function looks for data under ./data/features_extracted_per_grid and returns the training data as a numpy array
+training_data = data_sanitize.get_saved_training_data()
+```
+
 ### Fingerprinting
 Fingerprinting should be run **locally**. First, boot up a virtual environment. Then, install the requirements in `requirements_fingerprinting.tx` before running the script.
 
