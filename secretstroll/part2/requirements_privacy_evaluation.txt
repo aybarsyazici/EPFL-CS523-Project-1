@@ -1,7 +1,7 @@
 jupyter
 numpy
 matplotlib
-tabulate
+tabulate==0.8.10
 scipy
 geopy
 pandas
