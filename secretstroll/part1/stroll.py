@@ -100,10 +100,13 @@ class Server:
             #raise ValueError("[SERVER] Invalid subscriptions")
         # We could check the users name and see if he has subscribed to the requested subscriptions
         # but we will not do that here
-        issuer_attributes = {
-                subscription: Bn(1) 
-                for subscription in subscriptions 
-        }
+        issuer_attributes = {}
+        for subscription in server_pk_parsed.subscriptions.keys():
+            if subscription != "secret_key":
+                if subscription in subscriptions:
+                    issuer_attributes[subscription] = Bn(1)
+                else:
+                    issuer_attributes[subscription] = Bn(0)
         issuer_attributes["username"] = Bn.from_binary(username.encode("utf-8"))
         print(f"issuer_attributes are: " + str(issuer_attributes))
 
@@ -231,6 +234,7 @@ class Client:
 
         all_attributes = blindSign.attributes
         all_attributes["secret_key"] = self.secret
+        print("[CLIENT] All attributes are: " + str(all_attributes))
         anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
         return jsonpickle.encode(anonCred).encode("utf-8")
 

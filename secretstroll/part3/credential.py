@@ -153,7 +153,6 @@ class IssueRequest:
         self.proof = p_proof
 
 class IssueScheme:
-    @staticmethod
     def create_issue_request(
             pk: PublicKey,
             user_attributes: AttributeMap,
@@ -177,7 +176,10 @@ class IssueScheme:
         # get the public values necessary
         pk_y_vals = []
         secret_user_vals = []
-        for attr in user_attributes:
+        user_attributes_sorted = [attr for attr in user_attributes.keys()]
+        user_attributes_sorted.sort()
+        print("From create_issue_request: ", user_attributes_sorted )
+        for attr in user_attributes_sorted:
             i = pk.subscriptions[attr]
             pk_y_vals.append(pk.Y[i])
             secret_user_vals.append(user_attributes[attr])
@@ -208,8 +210,14 @@ class IssueScheme:
         This corresponds to the "Issuer signing" step in the issuance protocol.
         """
         assert len(issuer_attributes) <= len(sk.y)
+        # get user_attributes which are the attributes in the server pk key that are NOT in issuer_attributes
+        user_attributes = [attr for attr in pk.subscriptions.keys() if attr not in issuer_attributes.keys()]
+        # sort the user_attributes
+        user_attributes.sort()
+        print("From sign_issue_request: user_attributes = ", user_attributes)
         if not ProofHandler.verify(
             to_prove=request.c,
+            public_values= [pk.g] + [pk.Y[pk.subscriptions[attr]] for attr in user_attributes],
             proof=request.proof
             ):
             raise Exception("Incorrect proof!")
@@ -270,10 +278,12 @@ class DisclosureProof:
         hidden_attributes = [t]
         public_vals = [random_sign.h.pair(pk.gh)]
         revealed_attributes_map = {attr: credential.attributes[attr] for attr in revealed_attributes}
-        for attr, val in credential.attributes.items():
-            if attr not in revealed_attributes:
-                hidden_attributes.append(val)
-                public_vals.append(random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
+        hidden_attributes_sorted = [attr for attr in credential.attributes.keys() if attr not in revealed_attributes]
+        hidden_attributes_sorted.sort()
+        print("[CLIENT] Hiding attributes: ", hidden_attributes_sorted)
+        for attr in hidden_attributes_sorted:
+            hidden_attributes.append(credential.attributes[attr])
+            public_vals.append(random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
         to_prove = reduce(lambda x,y: x*y, (public_vals[i]**hidden_attributes[i] for i in range(len(public_vals))))
         # Create the proof
         proof = ProofHandler.generate(
@@ -310,10 +320,18 @@ def verify_disclosure_proof(
     print("[SERVER] Value to prove: ", disclosure_proof.to_prove)
     # Convert the message into an integer m.
     m = Bn.from_binary(message)
+    # get public values
+    public_vals = [disclosure_proof.random_sign.h.pair(pk.gh)]
+    hidden_attributes_sorted = [attr for attr in pk.subscriptions.keys() if attr not in disclosure_proof.revealed_attributes.keys()]
+    hidden_attributes_sorted.sort()
+    for attr in hidden_attributes_sorted:
+        public_vals.append(disclosure_proof.random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
+    print("[SERVER] Hidden attributes are: ", hidden_attributes_sorted)
     # Verify the proof
     if not (ProofHandler.verify(
         to_prove=reconstructed,
         proof=disclosure_proof.proof,
+        public_values=public_vals,
         message=m
     )): 
         print("[SERVER] Proof Handler returned false")

@@ -5,10 +5,9 @@ from petrelic.bn import Bn
 import hashlib
 
 class PedersenProof:
-    def __init__(self, challenge: int, response: List[int], public_values: List[int]):
+    def __init__(self, challenge: int, response: List[int]):
         self.challenge = challenge
         self.response = response
-        self.public_values = public_values
 
 
 def calc_challenge(
@@ -53,18 +52,18 @@ class ProofHandler:
         response = [(rands[i] - challenge * secret_values[i]) % G1.order() for i in range(len(secret_values))]
         print("[PROOF GENERATE]: Sending Response: " + str(response))
         print("[PROOF GENERATE]: Public vals are: " + str(public_values))
-        return PedersenProof(challenge=challenge, response=response, public_values=public_values)
+        return PedersenProof(challenge=challenge, response=response)
     
 
     @staticmethod
     def verify(
             to_prove: G1Element,
+            public_values: List[int],
             proof: PedersenProof,
             message: Bn = 0,
         ) -> bool:
         """ Verify that the commitment is a valid Pedersen commitment
         """
-        public_values = proof.public_values
         print("[PROOF VERIFY]: Public vals used are: " + str(public_values))
         print("[PROOF VERIFY]: Sent Responses are " + str(proof.response))
         assert(len(proof.response) == len(public_values))
