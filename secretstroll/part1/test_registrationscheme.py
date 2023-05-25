@@ -73,6 +73,116 @@ def test_simple_failed_reg():
     
     assert False
 
+def testInteractionMultipleClients():
+    """
+    Simulate expected interaction between Server and Client
+    """
+    # initiliaze Server
+    server_subs = ["school", "hotel", "library", "restaurant", "bar", "dojo", "username"]
+    server = Server()
+    server_sk,server_pk = Server.generate_ca(server_subs)
+    # initiliaze Client1 and Client2 and Client3
+    client1 = Client()
+    client2 = Client()
+    client3 = Client()
+    client1_subs, client2_subs, client3_subs = ["restaurant", "bar"], ["dojo", "hotel", "library"], ["restaurant"]
+    client1_name,client2_name,client3_name = "user12332", "aybars", "can"
+    #---------------------------------------
+    #---> Client1 - Prepare INVALID registration
+    invalid_subs = ["invalid_type","another_invalid_type"]
+    issuance_req, state = client1.prepare_registration(
+        server_pk, client1_name, invalid_subs
+    )
+    assert issuance_req is None
+    #---> Client1 - Prepare VALID registration
+    issuance_req1, state1 = client1.prepare_registration(
+        server_pk, client1_name, client1_subs
+    )
+    assert issuance_req1 is not None
+    #---> Client2 - Prepare VALID registration
+    issuance_req2, state2 = client2.prepare_registration(
+        server_pk, client2_name, client2_subs
+    )
+    #---> Client3 - Prepare VALID registration
+    issuance_req3, state3 = client3.prepare_registration(
+        server_pk, client3_name, client3_subs
+    )
+    
+    #---> Server - Process/handle registration with invalid subscriptions
+    registration_res = server.process_registration(
+        server_sk, server_pk, issuance_req1, client1_name, invalid_subs
+    )
+    assert registration_res is None
+    #---> Server - Process/handle valid registrations of multiple users
+    registration_res2 = server.process_registration(
+        server_sk, server_pk, issuance_req2, client2_name, client2_subs
+    )
+    registration_res1 = server.process_registration(
+        server_sk, server_pk, issuance_req1, client1_name, client1_subs
+    )
+    registration_res3 = server.process_registration(
+        server_sk, server_pk, issuance_req3, client3_name, client3_subs
+    )
+   
+    #---> Client1 - Process the response from the server (save credential)
+    credential1 = client1.process_registration_response(
+        server_pk, registration_res1, state1
+    )
+    #---> Client2 - Process the response from the server (save credential)
+    credential2 = client2.process_registration_response(
+        server_pk, registration_res2, state2
+    )
+    #---> Client3 - Process the response from the server (save credential)
+    credential3 = client3.process_registration_response(
+        server_pk, registration_res3, state3
+    )
+
+    # Now that each Client has obtainted their credentials, they can sign requests with it
+    #---> Clients - Sign request with obtained credential
+    lat,lon = 46.518839365687, 6.568393192707151
+    message = (f"{lat},{lon}").encode("utf-8")
+    types1,types2,types3 = ["restaurant", "bar"], ["hotel"], ["restaurant"] #types of services to request
+    #compute signature for each client msg
+    signature1 = client1.sign_request(server_pk, credential1, message, types1)
+    signature2 = client2.sign_request(server_pk, credential2, message, types2)
+    signature3 = client3.sign_request(server_pk, credential3, message, types3)
+    #compute a signature for an invalid request (client2 hasn't subscribed to "bar")
+    not_subscribed_types = ["hotel","bar"]
+    invalid_req_sign = client2.sign_request(server_pk, credential2, message, not_subscribed_types)
+    #compute a signature for an invalid subscription
+    assert client2.sign_request(server_pk, credential2, message, ["hotel","invalid_sub"]) is None
+
+
+    #---> Server - Check whether the signatures are valid, or not  
+    #   The following must be VALID:
+    assert server.check_request_signature(
+        server_pk, message, types1, signature1
+    )
+    assert server.check_request_signature(
+        server_pk, message, types2, signature2
+    )
+    assert server.check_request_signature(
+        server_pk, message, types3, signature3
+    )
+    # The following must be INVALID:
+    assert not server.check_request_signature(
+        server_pk, message, not_subscribed_types, invalid_req_sign
+    )
+    assert not server.check_request_signature(
+        server_pk, message, types2, signature1
+    )
+    assert not server.check_request_signature(
+        server_pk, message, types1, signature2
+    )
+    assert not server.check_request_signature(
+        server_pk, message, types3, signature2
+    )
+    assert not server.check_request_signature(
+        server_pk, message, types1, signature3
+    )
+    assert not server.check_request_signature(
+        server_pk, message, types2, signature3
+    )
 
 def test_with_multiple_clients():
     s = Server()

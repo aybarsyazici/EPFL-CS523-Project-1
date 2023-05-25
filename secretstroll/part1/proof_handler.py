@@ -102,4 +102,4 @@ class ProofHandler:
         response = [(rands[i] - challenge * (secret_values[i]*G1.order().random())) % G1.order() for i in range(len(secret_values))]
         print("[PROOF GENERATE]: Sending Response: " + str(response))
         print("[PROOF GENERATE]: Public vals are: " + str(public_values))
-        return PedersenProof(challenge=challenge, response=response, public_values=public_values)
+        return PedersenProof(challenge=challenge, response=response)
