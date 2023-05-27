@@ -189,14 +189,14 @@ class IssueScheme:
                     secret_values = [t] + secret_user_vals,
                     public_values=[pk.g] + pk_y_vals,
                     )
-            return IssueRequest(c, proof), t
+            return IssueRequest(c, proof), (t, user_attributes)
         else:
             proof = ProofHandler.generate(
                 to_prove=c,
                 public_values=[pk.g] + pk_y_vals,
                 secret_values=[t] + secret_user_vals 
             )
-            return IssueRequest(c, proof), t
+            return IssueRequest(c, proof), (t, user_attributes)
 
     @staticmethod
     def sign_issue_request(
