@@ -108,15 +108,15 @@ def eval_with_three_clients():
     #The following three are valid signatures
     #So the response should be valid
     res1 = measured(s.check_request_signature, measurements["server"]["check_request_signature"])(
-        server_pk, message, client1_requests, signature1
+        server_pk, message, client1_requests, signature1, measurements=measurements
     )
 
     res2 = measured(s.check_request_signature, measurements["server"]["check_request_signature"])(
-        server_pk, message, client2_requests, signature2
+        server_pk, message, client2_requests, signature2, measurements=measurements
     )
 
     res3 = measured(s.check_request_signature, measurements["server"]["check_request_signature"])(
-        server_pk, message, client3_requests, signature3
+        server_pk, message, client3_requests, signature3, measurements=measurements
     )
 
     assert res1
@@ -131,10 +131,12 @@ We measure the metrics for one client and the server
 """
 def eval_with_single_client():
     measurements = {}
-    measurements["client"] = {"prepare_registration": Measurement(), "process_registration_response": Measurement(), "sign_request": Measurement()}
-    measurements["server"] = {"generate_ca": Measurement(), "process_registration": Measurement(), "check_request_signature": Measurement()}
-    measurements["issuance"] = {"sign_issue_request": Measurement(), "create_issue_request": Measurement()}
-    measurements["signature"] = {"generate_key": Measurement()}
+    measurements["Client"] = {"prepare_registration": Measurement(), "process_registration_response": Measurement(), "sign_request": Measurement()}
+    measurements["Server"] = {"generate_ca": Measurement(), "process_registration": Measurement(), "check_request_signature": Measurement()}
+    measurements["IssueScheme"] = {"sign_issue_request": Measurement(), "create_issue_request": Measurement()}
+    measurements["SignatureScheme"] = {"generate_key": Measurement()}
+    measurements["DisclosureProof"] = {"create_disclosure_proof": Measurement(), "verify_disclosure_proof": Measurement()}
+    measurements["ProofHandler"] = {"generate": Measurement(), "verify": Measurement()}
 
     s = Server(measurement_mode=True)
     c1 = Client(measurement_mode=True)
@@ -152,20 +154,20 @@ def eval_with_single_client():
     client2_subs = ["hotel", "library", "restaurant", "bar", "dojo"]
     client2_name = "mike"
 
-    server_sk,server_pk = measured(s.generate_ca, measurements["server"]["generate_ca"])(server_subs, True, measurements=measurements)
+    server_sk,server_pk = measured(s.generate_ca, measurements["Server"]["generate_ca"])(server_subs, True, measurements=measurements)
 
     ######################################
     ##Prepare registration for all clients
     ######################################
     #Valid reg for c1
 
-    issuance_req1, state1 = measured(c1.prepare_registration, measurements["client"]["prepare_registration"])(server_pk, client1_name, client1_subs, measurements=measurements)
+    issuance_req1, state1 = measured(c1.prepare_registration, measurements["Client"]["prepare_registration"])(server_pk, client1_name, client1_subs, measurements=measurements)
     assert issuance_req1 is not None
     
     ################################################
     ##Process registration by server for all clients
     ################################################
-    registration_res1 = measured(s.process_registration, measurements["server"]["process_registration"])(
+    registration_res1 = measured(s.process_registration, measurements["Server"]["process_registration"])(
         server_sk, server_pk, issuance_req1, client1_name, client1_subs, measurements=measurements
     )
     assert registration_res1 is not None
@@ -173,7 +175,7 @@ def eval_with_single_client():
     ################################################
     ##Process registration response for all clients
     ################################################
-    credential1 = measured(c1.process_registration_response, measurements["client"]["process_registration_response"])(
+    credential1 = measured(c1.process_registration_response, measurements["Client"]["process_registration_response"])(
         server_pk, registration_res1, state1
     )
 
@@ -182,14 +184,14 @@ def eval_with_single_client():
     message = (f"{lat},{lon}").encode("utf-8")
     client1_requests = ["library"]
 
-    signature1 = measured(c1.sign_request, measurements["client"]["sign_request"])(server_pk, credential1, message, client1_requests)
+    signature1 = measured(c1.sign_request, measurements["Client"]["sign_request"])(server_pk, credential1, message, client1_requests, measurements=measurements)
 
     assert signature1 is not None
 
     #The following is valid signature
     #So the response should be valid
-    res1 = measured(s.check_request_signature, measurements["server"]["check_request_signature"])(
-        server_pk, message, client1_requests, signature1
+    res1 = measured(s.check_request_signature, measurements["Server"]["check_request_signature"])(
+        server_pk, message, client1_requests, signature1, measurements=measurements
     )
 
     assert res1
