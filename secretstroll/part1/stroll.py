@@ -225,20 +225,18 @@ class Client:
         Return:
             credentials: create an attribute-based credential for the user
         """
+        # Reconstruct server's response, which is a blind signature
         blindSign: BlindSignature = jsonpickle.decode(server_response)
-        sign: Signature = blindSign.sign
         # Reconstruct the server's public key
         server_pk = jsonpickle.decode(server_pk)
-        # user forms the signature = (h, H/h^t)
-        reconstructed_signature = Signature(sign.h, sign.H / (sign.h ** private_state[0]))
 
-        all_attributes = blindSign.attributes
-        # add user attributes to all attributes
-        user_attributes = private_state[1]
-        all_attributes.update(user_attributes)
-        print("[CLIENT] All attributes are: " + str(all_attributes))
-        anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
-        return jsonpickle.encode(anonCred).encode("utf-8")
+        return jsonpickle.encode(
+            IssueScheme.obtain_credential(
+                pk=server_pk,
+                response=blindSign,
+                t = private_state
+            )
+        ).encode("utf-8")
 
     def sign_request(
             self,

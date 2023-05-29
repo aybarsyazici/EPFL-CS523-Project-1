@@ -26,7 +26,7 @@ from measurement import measured
 
 
 # Type aliases
-State = Bn
+State = tuple[Bn, AttributeMap]
 
 class Server:
     """Server"""
@@ -203,10 +203,10 @@ class Client:
         attributes["secret_key"] = self.secret 
         # create issue req
         if self.measurement_mode:
-            issue_req, t = measured(IssueScheme.create_issue_request, measurements["issuance"]["create_issue_request"])(user_attributes=attributes, pk=server_pk, testing=testing)
+            issue_req, private_state = measured(IssueScheme.create_issue_request, measurements["issuance"]["create_issue_request"])(user_attributes=attributes, pk=server_pk, testing=testing)
         else:
-            issue_req, t = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
-        return (jsonpickle.encode(issue_req), t)
+            issue_req, private_state = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
+        return (jsonpickle.encode(issue_req), private_state)
 
     def process_registration_response(
             self,
@@ -225,18 +225,18 @@ class Client:
         Return:
             credentials: create an attribute-based credential for the user
         """
+        # Reconstruct server's response, which is a blind signature
         blindSign: BlindSignature = jsonpickle.decode(server_response)
-        sign: Signature = blindSign.sign
         # Reconstruct the server's public key
         server_pk = jsonpickle.decode(server_pk)
-        # user forms the signature = (h, H/h^t)
-        reconstructed_signature = Signature(sign.h, sign.H / (sign.h ** private_state))
 
-        all_attributes = blindSign.attributes
-        all_attributes["secret_key"] = self.secret
-        print("[CLIENT] All attributes are: " + str(all_attributes))
-        anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
-        return jsonpickle.encode(anonCred).encode("utf-8")
+        return jsonpickle.encode(
+            IssueScheme.obtain_credential(
+                pk=server_pk,
+                response=blindSign,
+                t = private_state
+            )
+        ).encode("utf-8")
 
     def sign_request(
             self,
