@@ -192,21 +192,22 @@ class IssueScheme:
                     secret_values = [t] + secret_user_vals,
                     public_values=[pk.g] + pk_y_vals,
                     )
-            return IssueRequest(c, proof), t
+            return IssueRequest(c, proof), (t, user_attributes)
         elif measurements is None:
             proof = ProofHandler.generate(
                 to_prove=c,
                 public_values=[pk.g] + pk_y_vals,
                 secret_values=[t] + secret_user_vals 
             )
-            return IssueRequest(c, proof), t
+            return IssueRequest(c, proof), (t, user_attributes)
         else:
             proof = measured(ProofHandler.generate, measurements["ProofHandler"]["generate"])(
                 to_prove=c,
                 public_values=[pk.g] + pk_y_vals,
                 secret_values=[t] + secret_user_vals 
             )
-            return IssueRequest(c, proof), t
+            return IssueRequest(c, proof), (t, user_attributes)
+
 
     @staticmethod
     def sign_issue_request(
@@ -260,15 +261,27 @@ class IssueScheme:
     @staticmethod
     def obtain_credential(
             pk: PublicKey,
-            t: Bn,
-            response: Signature
+            t: tuple[Bn, AttributeMap],
+            response: BlindSignature
         ) -> AnonymousCredential:
         """ Derive a credential from the issuer's response
 
         This corresponds to the "Unblinding signature" step.
         """
-        raise NotImplementedError()
+        sign: Signature = response.sign
 
+        # private state, which is the variable t, has the blinding factor at index 0
+        # and the user attributes at index 1
+        # user forms the signature = (h, H/h^t)
+        reconstructed_signature = Signature(sign.h, sign.H / (sign.h ** t[0]))
+
+        all_attributes = response.attributes
+        # add user attributes to all attributes
+        user_attributes = t[1]
+        all_attributes.update(user_attributes)
+        print("[CLIENT] All attributes are: " + str(all_attributes))
+        anonCred = AnonymousCredential(sign=reconstructed_signature, attributes=all_attributes) 
+        return anonCred
 
 ## SHOWING PROTOCOL ##
 
