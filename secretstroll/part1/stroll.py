@@ -212,7 +212,8 @@ class Client:
             self,
             server_pk: bytes,
             server_response: bytes,
-            private_state: State
+            private_state: State, 
+            measurements=None
         ) -> bytes:
         """Process the response from the server.
 
@@ -229,14 +230,19 @@ class Client:
         blindSign: BlindSignature = jsonpickle.decode(server_response)
         # Reconstruct the server's public key
         server_pk = jsonpickle.decode(server_pk)
-
-        return jsonpickle.encode(
-            IssueScheme.obtain_credential(
-                pk=server_pk,
-                response=blindSign,
-                t = private_state
+        if measurements is None:
+            credential = IssueScheme.obtain_credential(
+                    pk=server_pk,
+                    response=blindSign,
+                    t = private_state
             )
-        ).encode("utf-8")
+        else:
+            credential = measured(IssueScheme.obtain_credential, measurements["IssueScheme"]["obtain_credential"])(
+                    pk=server_pk,
+                    response=blindSign,
+                    t = private_state
+            )
+        return jsonpickle.encode(credential).encode("utf-8")
 
     def sign_request(
             self,
@@ -274,7 +280,7 @@ class Client:
                     types,
                     server_pk_parsed,
                     message
-                    )
+            )
         else: 
             disclosure_proof = measured(DisclosureProof.create_disclosure_proof, measurements["DisclosureProof"]["create_disclosure_proof"])(
                         credential_parsed,
