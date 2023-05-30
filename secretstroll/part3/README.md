@@ -26,6 +26,7 @@ Assuming the client has already registered: If not first register:
 #Open a shell
 $ docker exec -it cs523-client /bin/bash
 (client) $ cd /client
+# below line is not necessary if the client has already received the pk key, i.e. key-client.pub exists.
 (client) $ python3 client.py get-pk
 # below line is not necessary if the client is already registered
 (client) $ python3 client.py register -u your_name -S restaurant -S bar -S dojo

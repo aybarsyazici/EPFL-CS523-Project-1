@@ -20,7 +20,9 @@ Open a shell
 ```bash
 $ docker exec -it cs523-client /bin/bash
 (client) $ cd /client
+# below line is not necessary if the client has already received the pk key, i.e. key-client.pub exists.
 (client) $ python3 client.py get-pk
+# below line is not necessary if the client is already registered, i.e. the anon.cred file exists.
 (client) $ python3 client.py register -u your_name -S restaurant -S bar -S dojo
 (client) $ python3 client.py loc 46.52345 6.57890 -T restaurant -T bar
 ```
