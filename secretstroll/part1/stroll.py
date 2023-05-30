@@ -63,7 +63,7 @@ class Server:
         appended_subscriptions = subscriptions + ["secret_key"]
         
         if measurement_mode:
-            sk, pk = measured(SignatureScheme.generate_key, measurements["signature"]["generate_key"])(appended_subscriptions)
+            sk, pk = measured(SignatureScheme.generate_key, measurements["SignatureScheme"]["generate_key"])(appended_subscriptions)
         else:
             sk, pk = SignatureScheme.generate_key(appended_subscriptions)    
 
@@ -111,10 +111,9 @@ class Server:
         print(f"issuer_attributes are: " + str(issuer_attributes))
 
         if self.measurement_mode:
-            sign = measured(IssueScheme.sign_issue_request, measurements["issuance"]["sign_issue_request"])(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
+            sign = measured(IssueScheme.sign_issue_request, measurements["IssueScheme"]["sign_issue_request"])(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes, measurements=measurements)
         else:
             sign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
-
 
         blindSign = BlindSignature(sign=sign, attributes=issuer_attributes)
         print("[SERVER] Returning blind sign: " + str(blindSign))
@@ -125,7 +124,8 @@ class Server:
         server_pk: bytes,
         message: bytes,
         revealed_attributes: List[str],
-        signature: bytes
+        signature: bytes,
+        measurements= None
         ) -> bool:
         """ Verify the signature on the location request
 
@@ -154,7 +154,7 @@ class Server:
                 #the attr that the user wants to prove he has a valid subscription for, was not disclosed
                 return False  
 
-        return verify_disclosure_proof(server_pk,proof,message)
+        return measured(verify_disclosure_proof, measurements["DisclosureProof"]["verify_disclosure_proof"])(server_pk,proof,message, measurements=measurements)
 
 
 class Client:
@@ -203,7 +203,7 @@ class Client:
         attributes["secret_key"] = self.secret 
         # create issue req
         if self.measurement_mode:
-            issue_req, private_state = measured(IssueScheme.create_issue_request, measurements["issuance"]["create_issue_request"])(user_attributes=attributes, pk=server_pk, testing=testing)
+            issue_req, private_state = measured(IssueScheme.create_issue_request, measurements["IssueScheme"]["create_issue_request"])(user_attributes=attributes, pk=server_pk, testing=testing, measurements=measurements)
         else:
             issue_req, private_state = IssueScheme.create_issue_request(user_attributes=attributes, pk=server_pk, testing=testing)
         return (jsonpickle.encode(issue_req), private_state)
@@ -243,7 +243,8 @@ class Client:
             server_pk: bytes,
             credentials: bytes,
             message: bytes,
-            types: List[str]
+            types: List[str],
+            measurements= None
         ) -> bytes:
         """Signs the request with the client's credential.
 
@@ -267,11 +268,20 @@ class Client:
             return None
             #raise ValueError("[CLIENT] Invalid types")
         # Create the disclosure proof
-        disclosure_proof = DisclosureProof.create_disclosure_proof(
-                credential_parsed,
-                types,
-                server_pk_parsed,
-                message
-                )
+        if measurements is None:    
+            disclosure_proof = DisclosureProof.create_disclosure_proof(
+                    credential_parsed,
+                    types,
+                    server_pk_parsed,
+                    message
+                    )
+        else: 
+            disclosure_proof = measured(DisclosureProof.create_disclosure_proof, measurements["DisclosureProof"]["create_disclosure_proof"])(
+                        credential_parsed,
+                        types,
+                        server_pk_parsed,
+                        message,
+                        measurements=measurements
+                        )
         return jsonpickle.encode(disclosure_proof).encode("utf-8")
 

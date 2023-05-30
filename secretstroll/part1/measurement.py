@@ -22,6 +22,4 @@ def measured(f, measurement):
         #Update the measurement object
         measurement.update(dt, bytes_out)
         return out
-    return wrapper    
-
-
+    return wrapper

@@ -23,6 +23,8 @@ from serialization import jsonpickle
 from petrelic.multiplicative.pairing import G1, G2, G1Element, G2Element, GTElement
 from petrelic.bn import Bn
 from proof_handler import ProofHandler, PedersenProof
+from measurement import measured
+
 Attribute = Bn
 AttributeMap = Dict[str, Attribute]
 
@@ -156,7 +158,8 @@ class IssueScheme:
     def create_issue_request(
             pk: PublicKey,
             user_attributes: AttributeMap,
-            testing: bool = False
+            testing: bool = False,
+            measurements=None
         ) -> Tuple[IssueRequest, Bn]:
         """ Create an issuance request
 
@@ -190,20 +193,29 @@ class IssueScheme:
                     public_values=[pk.g] + pk_y_vals,
                     )
             return IssueRequest(c, proof), (t, user_attributes)
-        else:
+        elif measurements is None:
             proof = ProofHandler.generate(
                 to_prove=c,
                 public_values=[pk.g] + pk_y_vals,
                 secret_values=[t] + secret_user_vals 
             )
             return IssueRequest(c, proof), (t, user_attributes)
+        else:
+            proof = measured(ProofHandler.generate, measurements["ProofHandler"]["generate"])(
+                to_prove=c,
+                public_values=[pk.g] + pk_y_vals,
+                secret_values=[t] + secret_user_vals 
+            )
+            return IssueRequest(c, proof), (t, user_attributes)
+
 
     @staticmethod
     def sign_issue_request(
             sk: SecretKey,
             pk: PublicKey,
             request: IssueRequest,
-            issuer_attributes: AttributeMap
+            issuer_attributes: AttributeMap,
+            measurements=None
         ) -> Signature:
         """ Create a signature corresponding to the user's request
 
@@ -215,11 +227,21 @@ class IssueScheme:
         # sort the user_attributes
         user_attributes.sort()
         print("From sign_issue_request: user_attributes = ", user_attributes)
-        if not ProofHandler.verify(
-            to_prove=request.c,
-            public_values= [pk.g] + [pk.Y[pk.subscriptions[attr]] for attr in user_attributes],
-            proof=request.proof
-            ):
+
+        if measurements is None:
+            verified = ProofHandler.verify(
+                            to_prove=request.c,
+                            public_values= [pk.g] + [pk.Y[pk.subscriptions[attr]] for attr in user_attributes],
+                            proof=request.proof
+                        )
+        else:
+            verified = measured(ProofHandler.verify, measurements["ProofHandler"]["verify"])(
+                            to_prove=request.c,
+                            public_values= [pk.g] + [pk.Y[pk.subscriptions[attr]] for attr in user_attributes],
+                            proof=request.proof
+                        ) 
+        
+        if not verified:       
             raise Exception("Incorrect proof!")
         # Issuer will do a blind signature
         # It will add his attributes to the user's attributes
@@ -276,7 +298,8 @@ class DisclosureProof:
                  credential: AnonymousCredential,
                  revealed_attributes: List[str],
                  pk: PublicKey,
-                 message: bytes):
+                 message: bytes,
+                 measurements = None):
         # Convert the message into an integer m.
         m = Bn.from_binary(message)
         # User picks random values r,t
@@ -298,18 +321,27 @@ class DisclosureProof:
             public_vals.append(random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
         to_prove = reduce(lambda x,y: x*y, (public_vals[i]**hidden_attributes[i] for i in range(len(public_vals))))
         # Create the proof
-        proof = ProofHandler.generate(
-            to_prove=to_prove,
-            public_values=public_vals,
-            secret_values=hidden_attributes,
-            message=m
-        )
+        if measurements is None:
+            proof = ProofHandler.generate(
+                to_prove=to_prove,
+                public_values=public_vals,
+                secret_values=hidden_attributes,
+                message=m
+            )
+        else:
+            proof = measured(ProofHandler.generate, measurements["ProofHandler"]["generate"])(
+                to_prove=to_prove,
+                public_values=public_vals,
+                secret_values=hidden_attributes,
+                message=m
+            )    
         return DisclosureProof(proof, revealed_attributes_map, random_sign, to_prove)
 
 def verify_disclosure_proof(
         pk: PublicKey,
         disclosure_proof: DisclosureProof,
-        message: bytes
+        message: bytes,
+        measurements=None
     ) -> bool:
     """ Verify the disclosure proof
 
@@ -340,12 +372,21 @@ def verify_disclosure_proof(
         public_vals.append(disclosure_proof.random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]))
     print("[SERVER] Hidden attributes are: ", hidden_attributes_sorted)
     # Verify the proof
-    if not (ProofHandler.verify(
-        to_prove=reconstructed,
-        proof=disclosure_proof.proof,
-        public_values=public_vals,
-        message=m
-    )): 
+    if measurements is None:
+        verified = ProofHandler.verify(
+            to_prove=reconstructed,
+            proof=disclosure_proof.proof,
+            public_values=public_vals,
+            message=m
+        )
+    else:
+        verified = measured(ProofHandler.verify, measurements["ProofHandler"]["verify"])(
+            to_prove=reconstructed,
+            proof=disclosure_proof.proof,
+            public_values=public_vals,
+            message=m
+        )   
+    if not verified: 
         print("[SERVER] Proof Handler returned false")
         return False 
     print("[SERVER] Proof Handler returned true")
