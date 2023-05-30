@@ -35,6 +35,7 @@ COPY ./proof_handler.py /testing/code
 COPY ./test_signaturescheme.py /testing/code
 COPY ./test_registrationscheme.py /testing/code
 COPY ./serialization.py /testing/code
+COPY ./measurement.py /testing/code
 
 COPY ./requirements.txt /testing/
 RUN rm -rf /testing/code/docker && rm -rf /testing/code/report_template && rm -rf /testing/code/handout && rm -rf /testing/code/tor && rm -rf /testing/code/handout
