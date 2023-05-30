@@ -56,7 +56,7 @@ training_data = data_sanitize.get_saved_training_data()
 ```
 
 ### Fingerprinting
-Fingerprinting is done locally, without Docker. First, boot up a virtual environment. Then, install the requirements in `requirements_fingerprinting.tx` before running the script.
+Fingerprinting is done locally, without Docker. First, boot up a virtual environment. Then, install the requirements in `requirements_fingerprinting.txt` before running the script.
 
 ```bash
 $ python3 -m venv venv

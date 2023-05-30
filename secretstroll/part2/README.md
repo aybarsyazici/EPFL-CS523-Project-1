@@ -1,6 +1,6 @@
-For this part most of our implementations are explained in the notebook. 
+For this part most of our implementations are explained in the notebook(Don't forget to install the `requirements_privacy_evaluation.txt` file before running the notebook).
 
-But to evaluate our difference we have done a small scale data collection. For that we have modified client.py and added a new argument to it called eval
+To evaluate the defence we have suggested, we have done a small scale data collection. For that we have modified client.py and added a new argument to it called eval
 Firstly, setup client and server as explained in the previous sections:
 Initialization:
 Open a shell
