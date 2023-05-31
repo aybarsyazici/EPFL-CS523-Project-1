@@ -154,7 +154,15 @@ class Server:
                 #the attr that the user wants to prove he has a valid subscription for, was not disclosed
                 return False  
 
-        return verify_disclosure_proof(server_pk,proof,message)
+        if measurements is None:
+            verified = verify_disclosure_proof(
+                server_pk,proof,message
+            )
+        else:
+            verified = measured(verify_disclosure_proof, measurements["DisclosureProof"]["verify_disclosure_proof"])(
+                server_pk,proof,message, measurements=measurements
+            )
+        return verified
 
 
 class Client:
