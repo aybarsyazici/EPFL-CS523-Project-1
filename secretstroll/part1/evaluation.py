@@ -3,7 +3,6 @@ from measurement import Measurement, measured
 from stroll import Client, Server
 import os
 import sys
-import time
 import statistics as stat
 from math import sqrt
 
@@ -208,51 +207,61 @@ def eval_with_single_client():
     return measurements
 
 
-"""measurements = eval_with_single_client()
-curr = os.getcwd()
-os.chdir(curr + '/../part1_measurements')
-for key1 in measurements.keys():
-    val1 = measurements[key1]
-    for key2 in val1.keys():
-        f = open(f"{key1}--{key2}.txt", "a")
-        val2 = measurements[key1][key2]
-        s = str(val2.delta_t) + " " + str(val2.bytes_out)
-        f.write(s)
-"""
+if __name__ == '__main__':
+    print("Measurements running...")
+    #Take command line arguments
+    measurement_folder = sys.argv[1] #Measurement folder that will contain the measurements as .txt
+    num_exec = int(sys.argv[2]) #Number of executions
+    
+    #Check if the measurement folder already exists
+    curr = os.getcwd()
+    path = curr + measurement_folder
+    dirExists = os.path.exists(path)
 
-curr = os.getcwd()
-os.chdir(curr + '/../part1_measurements')
+    #If the measuremtns folder does not exist, create it
+    if not dirExists:
+        os.makedirs(path)
 
+    #Change working directory
+    os.chdir(path)
 
-measurements = init_measurements()
-measurements_temp = []
+    #Initialize the dictionary for the measurements
+    measurements = init_measurements()
+    measurements_temp = []
 
-for _ in range(100):
-    measurements_temp.append(eval_with_three_clients())
+    #Run for num_exec times and record the results to the temporary array
+    for _ in range(num_exec):
+        measurements_temp.append(eval_with_three_clients())
 
-for measurement_temp in measurements_temp:
-    for key1 in measurement_temp.keys():
-        val1 = measurement_temp[key1]
-        for key2 in val1.keys():
-            m = measurement_temp[key1][key2]
-            measurements[key1][key2].updateArray(m.delta_t, m.bytes_out)
+    #Combine the results from multiple rows
+    for measurement_temp in measurements_temp:
+        for key1 in measurement_temp.keys():
+            val1 = measurement_temp[key1]
+            for key2 in val1.keys():
+                m = measurement_temp[key1][key2]
+                measurements[key1][key2].updateArray(m.delta_t, m.bytes_out)
 
-for key1 in measurements.keys():
-        val1 = measurements[key1]
-        for key2 in val1.keys():
-            f = open(f"{key1}--{key2}.txt", "w")
-            m = measurements[key1][key2]
-            print(len(m.delta_t))
-
-            for i in range(len(m.delta_t)):
-                f.write(f"{str(round(m.delta_t[i], 3)): <8}")    
-                f.write(f"{m.bytes_out[i]}\n")        
-            f.write("Avg:\n")
-            f.write(f"{str(round(stat.mean(m.delta_t), 3)): <8}")    
-            f.write(f"{stat.mean(m.bytes_out)}\n")   
-            f.write("Std Dev:\n")
-            f.write(f"{round(stat.stdev(m.delta_t)/sqrt(len(m.delta_t)), 3): <8}")    
-            f.write(f"{round(stat.stdev(m.bytes_out)/sqrt(len(m.bytes_out)), 3)}\n")           
-            f.close()
-print("exec finished")            
-
+    """Write each measurement on the corresponding file
+    For example, the measurements for Client's sign_request function will be in
+    "Client--sign_request.txt" file
+    At the end of each file, we include the mean and standard error of the measurements
+    """
+    for key1 in measurements.keys():
+            val1 = measurements[key1]
+            for key2 in val1.keys():
+                f = open(f"{key1}--{key2}.txt", "w")
+                m = measurements[key1][key2]
+                f.write("Time (ms) | Output Size (bytes):\n")
+                f.write("-------------------------------\n")
+                for i in range(len(m.delta_t)):
+                    f.write(f"{str(round(m.delta_t[i], 3)): <18}")    
+                    f.write(f"{m.bytes_out[i]}\n")        
+                f.write("Average:\n")
+                f.write(f"{str(round(stat.mean(m.delta_t), 3)): <18}")    
+                f.write(f"{round(stat.mean(m.bytes_out), 3)}\n")   
+                f.write("Std Error:\n")
+                f.write(f"{round(stat.stdev(m.delta_t)/sqrt(len(m.delta_t)), 3): <18}")    
+                f.write(f"{round(stat.stdev(m.bytes_out)/sqrt(len(m.bytes_out)), 3)}\n")           
+                f.close()
+    print("Measurements complete. You can now find the results in the measurements folder")
+            

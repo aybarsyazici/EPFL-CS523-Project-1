@@ -36,24 +36,17 @@ $ docker compose down
 To test the code we have written a test docker container. To run the tests, run:
 ```bash
 # the rm flag removes the container after the tests are run
-$ docker-compose -f ./docker-compose.test.yml run --rm testing
+$ docker-compose -f ./docker-compose-testing.yaml run --rm testing
 # could also use the command below, but this causes the output to be less readable, thus not recommended
-$ docker-compose -f ./docker-compose.test.yml up -d 
+$ docker-compose -f ./docker-compose-testing.yaml up -d 
 ```
 These commands will run all the tests using pytest in test_registrationscheme.py and test_signaturescheme.py
 
 ### Measurements
-!!!!!TODO!!!!!
-Similar to the tests, measurements should be taken from inside one of the Docker containers. To perform measurements, run:
+Measurements are taken by evaluation.py, which should be run from inside one of the docker containers. To run, execute the following command inside the container:
 
 ```bash
-$ python3 measurements.py measure -o measurements/raw.csv -r 100
+$ python3 evaluation.py /measurements 100
 ```
 
-This will take raw measurements over 100 iterations and save it to `measurements/raw.csv`. To aggregate the results, run:
-
-```bash
-$ python3 measurements.py aggregate -i measurements/raw.csv -o measurements/stat.csv
-```
-
-This will aggregate the results and output the results to `measurements/stat/csv`.
+This will run the evaluation script 100 times and save the results in the measurements folder. In this folder, one can find the measurements of the functions that we included in the report.
