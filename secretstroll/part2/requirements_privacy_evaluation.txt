@@ -6,5 +6,5 @@ scipy
 geopy
 pandas
 seaborn
-sklearn
+scikit-learn
 tdqm
