@@ -43,10 +43,10 @@ $ docker-compose -f ./docker-compose-testing.yaml up -d
 These commands will run all the tests using pytest in test_registrationscheme.py and test_signaturescheme.py
 
 ### Measurements
-Measurements are taken by evaluation.py, which should be run from inside one of the docker containers. To run, execute the following command inside the container:
+Measurements are taken by evaluation.py, which should be run from inside one of the docker containers. To run, start the client's or server's docker container as explained above, and execute the following command inside the container:
 
 ```bash
-$ python3 evaluation.py /measurements 100
+$ python3 evaluation.py 100
 ```
 
 This will run the evaluation script 100 times and save the results in the measurements folder. In this folder, one can find the measurements of the functions that we included in the report.

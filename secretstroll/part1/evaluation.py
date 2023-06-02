@@ -209,13 +209,12 @@ def eval_with_single_client():
 
 if __name__ == '__main__':
     print("Measurements running...")
-    #Take command line arguments
-    measurement_folder = sys.argv[1] #Measurement folder that will contain the measurements as .txt
-    num_exec = int(sys.argv[2]) #Number of executions
+    #Take command line argument
+    num_exec = int(sys.argv[1]) #Number of executions
     
     #Check if the measurement folder already exists
     curr = os.getcwd()
-    path = curr + measurement_folder
+    path = curr + "/measurements"
     dirExists = os.path.exists(path)
 
     #If the measuremtns folder does not exist, create it
