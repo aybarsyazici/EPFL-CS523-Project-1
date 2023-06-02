@@ -207,6 +207,7 @@ class Client:
         # Subscriptions and username are server issued
         # User will only have one secret key
         self.secret = G1.order().random()
+
         attributes["secret_key"] = self.secret 
         # create issue req
         if self.measurement_mode:

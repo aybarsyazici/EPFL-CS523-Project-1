@@ -32,7 +32,7 @@ $ docker exec -it cs523-client /bin/bash
 (client) $ python3 client.py get-pk
 # below line is not necessary if the client is already registered
 (client) $ python3 client.py register -u your_name -S restaurant -S bar -S dojo
-(client) $ python3 data_collect.py --min 1 --max 100 --requests 50 -T restaurant
+(client) $ python3 data_collect.py --min 1 --max 100 --runs 50 -T restaurant
 ```
 This will give the results discussed in the report, and will save the data as .pcapng files under the ./data directory.
 

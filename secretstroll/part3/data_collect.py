@@ -21,7 +21,7 @@ def collect_trace(id, run, grid, subs):
             break
         else:
             wait_time *= 2
-            print("Retrying ... ")
+            print("Retrying ... ", client_result.stderr)
             time.sleep(wait_time)
     
 
