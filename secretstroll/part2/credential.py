@@ -165,6 +165,10 @@ class IssueScheme:
 
         This corresponds to the "user commitment" step in the issuance protocol.
         """
+        # if one user attribute does not exist in public key attributes, raise an exception
+        for attr in user_attributes.keys():
+            if attr not in pk.subscriptions.keys():
+                raise Exception("Attribute " + attr + " does not exist in public key attributes")
         # User will calculate a commitment
         # c = g^t * prod(Y[i]^m[i])
         # where t is a random integer
@@ -221,7 +225,10 @@ class IssueScheme:
 
         This corresponds to the "Issuer signing" step in the issuance protocol.
         """
-        assert len(issuer_attributes) <= len(sk.y)
+        # check if all issuer attributes exist in public key attributes
+        for attr in issuer_attributes.keys():
+            if attr not in pk.subscriptions.keys():
+                raise Exception("Attribute " + attr + " does not exist in public key attributes")
         # get user_attributes which are the attributes in the server pk key that are NOT in issuer_attributes
         user_attributes = [attr for attr in pk.subscriptions.keys() if attr not in issuer_attributes.keys()]
         # sort the user_attributes
@@ -301,6 +308,10 @@ class DisclosureProof:
                  pk: PublicKey,
                  message: bytes,
                  measurements = None):
+        # check if all revealed attributes exist in public key attributes
+        for attr in revealed_attributes:
+            if attr not in pk.subscriptions.keys():
+                raise Exception("Attribute " + attr + " does not exist in public key attributes")
         # Convert the message into an integer m.
         m = Bn.from_binary(message)
         # User picks random values r,t
@@ -357,9 +368,11 @@ def verify_disclosure_proof(
     # Reconstruct the value to be proven by using the disclosed attributes
     for attr,val in disclosure_proof.revealed_attributes.items():
         print("[SERVER] Attribute: ", attr, " Value: ", val)
-    reconstructed = disclosure_proof.random_sign.H.pair(pk.gh) * reduce(
-        lambda x,y: x*y, (disclosure_proof.random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]) ** (-val) for attr,val in disclosure_proof.revealed_attributes.items())
-    )
+    reconstructed = disclosure_proof.random_sign.H.pair(pk.gh)
+    if(len(disclosure_proof.revealed_attributes) > 0):
+        reconstructed *= reduce(
+            lambda x,y: x*y, (disclosure_proof.random_sign.h.pair(pk.Yh[pk.subscriptions[attr]]) ** (-val) for attr,val in disclosure_proof.revealed_attributes.items())
+        )
     reconstructed = reconstructed / disclosure_proof.random_sign.h.pair(pk.Xh)
     print("[SERVER] Reconstructed value: ", reconstructed)
     print("[SERVER] Value to prove: ", disclosure_proof.to_prove)

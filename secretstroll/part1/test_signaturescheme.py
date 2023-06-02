@@ -46,7 +46,7 @@ def testABC():
     # Now, let's test the credential against the verifier.
     msg = "lisbon".encode()
     # At the prover. Hide the secret, which is part of the returned state.
-    proof = DisclosureProof.create_disclosure_proof(pk=pk, credential=credential, revealed_attributes=["user_attribute1", "issuer_attribute1"], message=msg)
+    proof = DisclosureProof.create_disclosure_proof(pk=pk, credential=credential, revealed_attributes=[], message=msg)
     # At the verifier.
     assert verify_disclosure_proof(pk=pk, disclosure_proof=proof, message=msg)
     # Test incorrect message.
@@ -54,3 +54,7 @@ def testABC():
     # Test incorrect proof.
     proof.random_sign.h = proof.random_sign.h ** 2
     assert not verify_disclosure_proof(pk=pk, disclosure_proof=proof, message=msg)
+
+# main
+if __name__ == "__main__":
+    testABC()
