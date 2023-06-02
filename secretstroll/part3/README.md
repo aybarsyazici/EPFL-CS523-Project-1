@@ -1,8 +1,7 @@
-# Running
-
-## Task 3
-### Data Collection
+# Task 3
+## Data Collection
 Fire up the docker containers, and boot up the server.
+
 Initialization:
 Open a shell
 ```
@@ -11,6 +10,7 @@ $ docker compose up -d
 ```
  
 Assuming that the server already has the keys generated: If not first generate the keys:
+
 Server side:
 ```bash
 #Open a shell
@@ -22,6 +22,8 @@ $ docker exec -it cs523-server /bin/bash
 ```
 
 Assuming the client has already registered: If not first register:
+
+Client side:
 ```bash
 #Open a shell
 $ docker exec -it cs523-client /bin/bash
@@ -33,14 +35,18 @@ $ docker exec -it cs523-client /bin/bash
 (client) $ python3 data_collect.py --min 1 --max 100 --requests 50 -T restaurant
 ```
 This will give the results discussed in the report, and will save the data as .pcapng files under the ./data directory.
-!!!!!!WARNING: Takes a really long amount of time!!!!!!
 
+```diff
+- !!!!!WARNING: Takes a really long amount of time!!!!!!
+```
+___
+## Feature Extraction
 To run the the fingerprinting, we need to extract features from these files. This can be done in two ways:
 
 1. import data_sanitize.py and run:
 ```python
 # Get traces
-traces = data_sanitize.get_traces()
+traces = data_sanitize.get_traces() # Will look for .pcapng files under ./data
 # Now get the features from the traces, returns numpy array
 training_data = data_sanitize.get_training_data_from_traces(traces)
 ```
@@ -48,15 +54,17 @@ training_data = data_sanitize.get_training_data_from_traces(traces)
 ```bash
 python3 ./data_sanitizer.py
 ```
-Which will do the steps described above and save the training data as .npy files for each grid under ./data/features_extracted_per_grid. 
+Which will do the steps described above and **save** the training data as **.npy** files for each grid under ./data/features_extracted_per_grid. 
 You can import these data and convert them to numpy arrays manually or again you can import data_sanitize.py and just run:
 ```python
 # This function looks for data under ./data/features_extracted_per_grid and returns the training data as a numpy array
 training_data = data_sanitize.get_saved_training_data()
 ```
+___
+## Fingerprinting
+Fingerprinting is done locally, without Docker. Make sure you have the data as .npy files under `/data/features_extracted_per_grid`. 
 
-### Fingerprinting
-Fingerprinting is done locally, without Docker. First, boot up a virtual environment. Then, install the requirements in `requirements_fingerprinting.txt` before running the script.
+First, boot up a virtual environment. Then, install the requirements in `requirements_fingerprinting.txt` before running the script.
 
 ```bash
 $ python3 -m venv venv

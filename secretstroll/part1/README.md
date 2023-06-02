@@ -38,7 +38,7 @@ To test the code we have written a test docker container. To run the tests, run:
 # the rm flag removes the container after the tests are run
 $ docker-compose -f ./docker-compose-testing.yaml run --rm testing
 # could also use the command below, but this causes the output to be less readable, thus not recommended
-$ docker-compose -f ./docker-compose-testing.yaml up -d 
+$ docker-compose -f ./docker-compose-testing.yaml up
 ```
 These commands will run all the tests using pytest in test_registrationscheme.py and test_signaturescheme.py
 

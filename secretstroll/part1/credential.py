@@ -216,7 +216,7 @@ class IssueScheme:
             request: IssueRequest,
             issuer_attributes: AttributeMap,
             measurements=None
-        ) -> Signature:
+        ) -> BlindSignature:
         """ Create a signature corresponding to the user's request
 
         This corresponds to the "Issuer signing" step in the issuance protocol.
@@ -256,7 +256,8 @@ class IssueScheme:
             Y = pk.Y[i]
             H *= Y**attribute_value
         H = H**u
-        return Signature(h, H)
+        sign = Signature(h, H)
+        return BlindSignature(sign=sign, attributes=issuer_attributes)
 
     @staticmethod
     def obtain_credential(

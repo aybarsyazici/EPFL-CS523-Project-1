@@ -111,11 +111,10 @@ class Server:
         print(f"issuer_attributes are: " + str(issuer_attributes))
 
         if self.measurement_mode:
-            sign = measured(IssueScheme.sign_issue_request, measurements["IssueScheme"]["sign_issue_request"])(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes, measurements=measurements)
+            blindSign = measured(IssueScheme.sign_issue_request, measurements["IssueScheme"]["sign_issue_request"])(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes, measurements=measurements)
         else:
-            sign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
+            blindSign = IssueScheme.sign_issue_request(server_sk_parsed, server_pk_parsed, jsonpickle.decode(issuance_request), issuer_attributes)
 
-        blindSign = BlindSignature(sign=sign, attributes=issuer_attributes)
         print("[SERVER] Returning blind sign: " + str(blindSign))
         return jsonpickle.encode(blindSign)
 
