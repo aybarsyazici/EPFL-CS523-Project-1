@@ -233,7 +233,6 @@ class IssueScheme:
         user_attributes = [attr for attr in pk.subscriptions.keys() if attr not in issuer_attributes.keys()]
         # sort the user_attributes
         user_attributes.sort()
-        print("From sign_issue_request: user_attributes = ", user_attributes)
 
         if measurements is None:
             verified = ProofHandler.verify(
@@ -264,7 +263,7 @@ class IssueScheme:
             H *= Y**attribute_value
         H = H**u
         sign = Signature(h, H)
-        return BlindSignature(sign=sign, attributes=issuer_attributes)
+        return BlindSignature(sign=sign, attributes=issuer_attributes.copy())
 
     @staticmethod
     def obtain_credential(
