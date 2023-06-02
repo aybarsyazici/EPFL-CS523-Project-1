@@ -1,5 +1,5 @@
-# Running
-### Client & Server
+# Task 1
+## Running the Client & Server
 The docker infrastructure remains the same.
 Initialization:
 Open a shell
@@ -31,8 +31,8 @@ Close everything down at the end of the experiment:
 ```
 $ docker compose down
 ```
-
-### Tests
+___
+## Tests
 To test the code we have written a test docker container. To run the tests, run:
 ```bash
 # the rm flag removes the container after the tests are run
@@ -41,8 +41,8 @@ $ docker-compose -f ./docker-compose-testing.yaml run --rm testing
 $ docker-compose -f ./docker-compose-testing.yaml up
 ```
 These commands will run all the tests using pytest in test_registrationscheme.py and test_signaturescheme.py
-
-### Measurements
+___
+## Measurements
 Measurements are taken by evaluation.py, which should be run from inside one of the docker containers. To run, start the client's or server's docker container as explained above, and execute the following command inside the container:
 
 ```bash
